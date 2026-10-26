@@ -1,0 +1,33 @@
+/* Walk-through control. reveal.js keeps its own controls at the bottom right. */
+.walkthrough-audio { display: none; }
+
+.walkthrough-btn {
+  position: fixed;
+  z-index: 40;
+  left: 96px;   /* clear of the slide-number box (deck.css puts it bottom-left) */
+  bottom: 6px;
+  margin: 0;
+  padding: 5px 14px;
+  border: 1px solid var(--border-strong, rgba(255, 255, 255, 0.24));
+  border-radius: 999px;
+  background: transparent;
+  color: var(--near-off-white, #f2f2f1);
+  font: 500 14px/1 "FK Grotesk", "Helvetica Neue", sans-serif;
+  cursor: pointer;
+}
+
+.walkthrough-btn.is-playing {
+  background: var(--near-green, #00ec97);
+  border-color: var(--near-green, #00ec97);
+  color: var(--near-black, #000);
+}
+
+.walkthrough-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+@media print {
+  .walkthrough-btn,
+  .walkthrough-audio { display: none !important; }
+}

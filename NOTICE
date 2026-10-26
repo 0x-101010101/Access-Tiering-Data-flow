@@ -1,0 +1,28 @@
+This presentation includes reveal.js by Hakim El Hattab and contributors,
+distributed under the MIT License. The full notice and permission text are
+in vendor/reveal.js/LICENSE.
+
+FK Grotesk and FK Grotesk Mono, the same woff2 cuts used by the monitors
+app, are the deck faces. The files under deck/vendor/near/fonts/ ship so
+the deck opens offline. They are not an open font; reuse outside this
+deck needs the type license that came with the brand system.
+
+Source Sans Pro fonts are distributed under the SIL Open Font License 1.1.
+The full copyright and license text are in
+vendor/reveal.js/dist/theme/fonts/source-sans-pro/LICENSE.
+
+The CSS reset in vendor/reveal.js/dist/reset.css is Eric Meyer's reset,
+released into the public domain. The notes plugin bundles marked under
+the MIT License: Copyright (c) 2018+ MarkedJS and Copyright (c) 2011-2018
+Christopher Jeffrey. Its permission terms are the MIT text in
+vendor/reveal.js/LICENSE.
+
+Original walkthrough plugin (vendor/walkthrough/):
+Copyright 2026 Gabriel Coleman; terms to be confirmed.
+This is a placeholder for the owner's confirmation, not a reuse grant.
+
+Narration was generated locally with Kokoro-82M, voice af_heart, using
+kokoro-onnx 0.6.1. The model weights are licensed under Apache-2.0;
+the weights and voice files are not included in this presentation.
+The model's license does not automatically license this deck, its original
+plugin, or its generated audio. No additional reuse terms are granted here.

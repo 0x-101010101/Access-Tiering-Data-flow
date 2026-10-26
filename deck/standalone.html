@@ -1,0 +1,4161 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <title>Access Tiering &amp; Data Flow</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="vendor/reveal.js/dist/reset.css">
+  <link rel="stylesheet" href="vendor/reveal.js/dist/reveal.css">
+  <style>
+    .reveal .sourceCode {  /* see #7635 */
+      overflow: visible;
+    }
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="vendor/reveal.js/dist/theme/white.css" id="theme">
+  <link rel="stylesheet" href="deck.css"/>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" data-background-color="#000000">
+  <h1 class="title">Access Tiering &amp; Data Flow</h1>
+  <p class="subtitle">Internal framework &amp; foundation to promote
+observablity and granular control over all data flowing through Near
+Intents</p>
+  <p class="date">Draft · → the pitch · ↓ more detail, light then
+heavy</p>
+</section>
+
+<section id="overview" class="title-slide slide level1 overview">
+<h1 class="overview">Overview</h1>
+<p>Press <strong>o</strong> any time to come back here.
+<strong>→</strong> is the pitch. <strong>↓</strong> adds detail, light
+first, then heavier.</p>
+<div class="overview-list">
+<ul>
+<li><span class="ovgroup">open</span></li>
+<li><span class="ovnum">3</span> <span class="ovkind slide">slide</span>
+<a href="#/cold">Past product-market fit</a></li>
+<li><span class="ovnum">4</span> <span
+class="ovkind vision">vision</span> <a href="#/what-we-want">Model
+Definition: Roles for people, tiers for data</a></li>
+<li><span class="ovnum">5</span> <span
+class="ovkind vision">vision</span> <a href="#/rbac-applied">ReBAC: the
+stricter label stays</a></li>
+<li><span class="ovnum">6</span> <span
+class="ovkind vision">vision</span> <a href="#/data-classification">Data
+Classification: a T2 reader sees the log line, minus secret
+fields</a></li>
+<li><span class="ovnum">7</span> <span
+class="ovkind vision">vision</span> <a href="#/on-the-record">On the
+record: everything recorded, auditability</a></li>
+<li><span class="ovnum">8</span> <span
+class="ovkind vision">vision</span> <a href="#/data-control-flow">Data
+Flow: topological view of data flow</a></li>
+<li><span class="ovnum">9</span> <span
+class="ovkind vision">vision</span> <a href="#/for-them">Long Term
+Vision: Wouldn’t it be nice</a></li>
+<li><span class="ovnum">10</span> <span
+class="ovkind vision">vision</span> <a href="#/case-refund">Refunds And
+Sanctioned LiquidityManual Refunds / AML release with one front
+door.</a></li>
+<li><span class="ovnum">11</span> <span
+class="ovkind vision">vision</span> <a href="#/case-teams">Independat
+Team Scaling: roles to climb, depth added as needed</a></li>
+<li><span class="ovnum">12</span> <span
+class="ovkind vision">vision</span> <a href="#/case-card">Crypto Card
+Market &amp; Data integrity: a user under investigation</a></li>
+<li><span class="ovnum">13</span> <span
+class="ovkind vision">vision</span> <a href="#/case-agent">Bullet Proof
+Sandbox To Faciliate Agents: an agent can burn Intents, or run
+free</a></li>
+<li><span class="ovnum">14</span> <span
+class="ovkind vision">vision</span> <a href="#/sealed-space">Bullet
+Proof Sandbox To Faciliate Agents: a sealed room with one door</a></li>
+<li><span class="ovnum">15</span> <span
+class="ovkind vision">vision</span> <a href="#/sealed-in">Bullet Proof
+Sandbox To Faciliate Agents: a question goes in through the
+bastion</a></li>
+<li><span class="ovnum">16</span> <span
+class="ovkind vision">vision</span> <a href="#/sealed-ask">Bullet Proof
+Sandbox To Faciliate Agents: a finding comes out, not the data</a></li>
+<li><span class="ovnum">17</span> <span
+class="ovkind vision">vision</span> <a href="#/sealed-reveal">Bullet
+Proof Sandbox To Faciliate Agents: confidence is high enough:
+reveal</a></li>
+<li><span class="ovnum">18</span> <span
+class="ovkind vision">vision</span> <a href="#/sealed-audit">Bullet
+Proof Sandbox To Faciliate Agents: the audit: inputs visible, sealed
+outputs stay sealed</a></li>
+<li><span class="ovgroup">where we are</span></li>
+<li><span class="ovnum">19</span> <span
+class="ovkind concept">concept</span> <a href="#/where-we-are">Current
+state of NEAR Intents: Where we are</a></li>
+<li><span class="ovnum">20</span> <span class="ovkind case">case</span>
+<a href="#/queue">Today, the work waits on a few people</a></li>
+<li><span class="ovnum">21</span> <span class="ovkind case">case</span>
+<a href="#/no-role">No role, so only the tenured learn it</a></li>
+<li><span class="ovnum">22</span> <span class="ovkind case">case</span>
+<a href="#/open-data">Today, sensitive data is already in the
+open</a></li>
+<li><span class="ovnum">23</span> <span class="ovkind case">case</span>
+<a href="#/service-shut">A service is open, or it is shut</a></li>
+<li><span class="ovgroup">the proposal</span></li>
+<li><span class="ovnum">24</span> <span
+class="ovkind concept">concept</span> <a href="#/roadmap">Five
+versions</a></li>
+<li><span class="ovnum">25</span> <span
+class="ovkind concept">concept</span> <a href="#/v1">The service is the
+tier</a></li>
+<li><span class="ovnum">26</span> <span
+class="ovkind concept">concept</span> <a href="#/v2">One service at a
+time</a></li>
+<li><span class="ovnum">27</span> <span
+class="ovkind concept">concept</span> <a href="#/v3">The foundation is
+in</a></li>
+<li><span class="ovnum">28</span> <span
+class="ovkind concept">concept</span> <a href="#/v4">A gateway, in
+parallel</a></li>
+<li><span class="ovnum">29</span> <span
+class="ovkind concept">concept</span> <a href="#/v5">The backdoor comes
+out</a></li>
+<li><span class="ovgroup">leave with this</span></li>
+<li><span class="ovnum">30</span> <span
+class="ovkind closing">closing</span> <a href="#/matrix">What becomes
+true</a></li>
+<li><span class="ovgroup">close</span></li>
+<li><span class="ovnum">31</span> <span
+class="ovkind vision">vision</span> <a href="#/circle">This versioned
+approach: the path of least friction to this vision</a></li>
+<li><span class="ovnum">32</span> <span
+class="ovkind vision">vision</span> <a href="#/factories">Where NEAR is
+going: AI factories and confidential inference</a></li>
+<li><span class="ovnum">33</span> <span
+class="ovkind slide">slide</span> <a href="#/mic">Ban agents, and a fire
+lasts a week</a></li>
+</ul>
+</div>
+<aside class="notes">
+<p>This is the route. Right goes through the pitch. Down on any slide
+adds detail, and the first step down is the light one. The last step
+down is the heavy one.</p>
+<p><strong>More:</strong></p>
+<p>The pitch opens on two lines: past product-market fit, we cannot keep
+accumulating technical debt, and to stop we need a long-term compass.
+Then the vision, then four slides that talk the problems: the work
+waiting, no role, sensitive data already in the open, and a service that
+is open or shut. Then a roadmap of five versions, and one slide for
+each, with that step lit. The matrix is the leave-behind. After it, bind
+the five steps back to the vision, then AI factories and confidential
+inference, then the one sentence, and stop.</p>
+</aside>
+</section>
+
+<section>
+<section id="cold" class="title-slide slide level1 cold stay-dark">
+<h1 class="cold stay-dark">Past product-market fit</h1>
+<p class="lede">
+We cannot afford to keep accumulating technical debt.
+</p>
+<p class="line">
+To stop doing that, we need a long-term compass.
+</p>
+<aside class="notes">
+<p>Two lines, then stop. We are past product-market fit. We cannot
+afford to keep accumulating technical debt. To stop doing that, we need
+a long-term compass. Serious, and we are here to help. The vision is the
+next slide. Do not open a version, a card, or an agent.</p>
+</aside>
+</section>
+<section id="cold--review" class="slide level2 cold stay-dark review">
+<h2 class="cold stay-dark review">Review · the open, and the breath</h2>
+<p class="kicker">
+Not for the room. 22 Oct. Remove before the pitch.
+</p>
+<ul>
+<li><strong>Heard.</strong> People remember the beginning and the end.
+When a new concept arrives, take a breath, say one sentence, and let it
+land. The deck is long, so those breaths are how a section gets
+ingested.</li>
+<li><strong>Your words.</strong> This slide is the two lines. In the 19
+Oct session, at 01:38:37, he called the same two lines the cold shower,
+and you took them as the opener.</li>
+<li><strong>Suggested.</strong> Keep the two lines. Before role, tier,
+bastion, or sealed, stop. One sentence, then the next slide. The end
+people remember is the last slide. This is the beginning.</li>
+<li><strong>“Will not make us survive”</strong> is in his 22 Oct notes.
+It is not on this slide and not in the 19 Oct transcript. He had no
+preference between that and “make us stronger at being successful.” The
+compass line stays. The survival line stays off.</li>
+</ul>
+<aside class="notes">
+<p>Review slide for the 22 Oct notes. Skip it in the room.</p>
+</aside>
+</section></section>
+<section>
+<section id="what-we-want" class="title-slide slide level1 vision">
+<h1 class="vision">Model Definition: Roles for people, tiers for
+data</h1>
+<p class="kicker">
+The vision. It will change as each stage lands.
+</p>
+<p class="hook">
+Several tracks, one system.
+</p>
+<div class="cards">
+<div class="card">
+<h3>
+Roles around the data
+</h3>
+<p>
+What a person can read is their role, applied to how sensitive the data
+is. The team that owns the service grants the role.
+</p>
+</div>
+<div class="card">
+<h3>
+Data classification
+</h3>
+<p>
+Sensitivity is declared once, where the data is produced, and it travels
+with the data.
+</p>
+</div>
+<div class="card">
+<h3>
+On the record
+</h3>
+<p>
+Every privileged read, grant, and command. Who can see what, who saw
+what, and why.
+</p>
+</div>
+<div class="card">
+<h3>
+Data flow
+</h3>
+<p>
+A view of the data moving through Intents, not only of the service that
+runs it.
+</p>
+</div>
+</div>
+<p class="dest">
+Not by who they know, and not by who is awake.
+</p>
+<aside class="notes">
+<p>What follows is the vision. Several tracks move at once. They are one
+system, which is why they are in one room. It will change as each stage
+lands. You are invited into the direction. What a person can read is
+their role, applied to how sensitive the data is. The team that owns the
+service grants the role, and it expires on its own. Sensitivity is
+declared once, where the data is produced, and it travels with the data.
+Every privileged read, grant, and command is on the record. The view is
+the data moving through Intents, not only the service that runs it.
+Access is decided by the data’s sensitivity and the person’s role, not
+by who they know or who is awake.</p>
+<p><strong>More:</strong></p>
+<p>The two lines over the cards are the frame. Stay until the room can
+say them. The next slide is the relationship graph. The log line
+follows, then the compromised laptop, then the data-flow close. Down is
+today against one way it could feel, then a crash, then a confidential
+swap. Do not open agents.</p>
+</aside>
+</section>
+<section id="what-we-want--review" class="slide level2 vision review">
+<h2 class="vision review">Review · invite them into one system</h2>
+<p class="kicker">
+Not for the room. 22 Oct. Remove before the pitch.
+</p>
+<ul>
+<li><strong>Heard.</strong> Set the mental model at the start. This is a
+longer journey, several tracks in parallel, connecting into one coherent
+system, which is why they are shown together. Invite them into the
+vision. The slides are a direction and a work in progress. They evolve
+as each stage lands.</li>
+<li><strong>On the face now.</strong> “The vision. It will change as
+each stage lands.” “Several tracks, one system.” The four cards are the
+cleaned sentences. The last line is unchanged.</li>
+<li><strong>Still spoken.</strong> “They are one system, which is why
+they are in one room. You are invited into the direction.”</li>
+<li>ReBAC is named once, on the next slide, on the failed confidential
+swap.</li>
+</ul>
+<aside class="notes">
+<p>Review slide for the 22 Oct notes. Skip it in the room.</p>
+</aside>
+</section>
+<section id="what-we-want--could-feel" class="slide level2 vision">
+<h2 class="vision">Today, and one way it could feel</h2>
+<p class="depth">
+A little more
+</p>
+<div class="columns">
+<div class="column before">
+<p><strong>today</strong></p>
+<ul>
+<li><strong>Who can look.</strong> Access sits with a few roles.</li>
+<li><strong>Who approves.</strong> The same few roles.</li>
+<li><strong>What is recorded.</strong> Reads and commands are missing
+from the record.</li>
+<li><strong>A stolen laptop.</strong> It can expose the lead’s project
+access.</li>
+<li><strong>Outputs.</strong> The person running it may see them.</li>
+<li><strong>Learning.</strong> Only tenured engineers touch
+production.</li>
+</ul>
+</div><div class="column after">
+<p><strong>could feel</strong></p>
+<ul>
+<li><strong>Who can look.</strong> Tier 2 and tier 3 by role. Tier 0 and
+tier 1 stay time-boxed and approved.</li>
+<li><strong>Who approves.</strong> At least three people in the domain.
+A colleague, live.</li>
+<li><strong>What is recorded.</strong> A record growing toward every
+privileged read, grant, and command.</li>
+<li><strong>A stolen laptop.</strong> A live grant is still a window.
+Version 1 records the query, not the rows.</li>
+<li><strong>Outputs.</strong> Sealed, and revealed only when
+needed.</li>
+<li><strong>Learning.</strong> A graduation path.</li>
+</ul>
+</div>
+</div>
+<aside class="notes">
+<p>Six rows, and the left is today. The right is one way it could feel.
+Who can look, who approves, what is recorded, a stolen laptop, the
+outputs, and how a new person learns production.</p>
+</aside>
+</section>
+<section id="what-we-want--listener" class="slide level2 vision">
+<h2 class="vision">In a restricted cluster, a non-critical crash waits
+for someone with access</h2>
+<p class="depth high">
+In detail
+</p>
+<div class="columns">
+<div class="column before">
+<p><strong>today</strong></p>
+<ul>
+<li>the engineer pings a lead for logs</li>
+<li>one error took days; an OOM theory was going around</li>
+<li>the real error: one line</li>
+</ul>
+</div><div class="column after">
+<p><strong>could feel</strong></p>
+<ul>
+<li>the engineer could read permitted T2/T3 logs</li>
+<li>the error could be inspected sooner</li>
+<li>fewer requests to a lead</li>
+</ul>
+</div>
+</div>
+<aside class="notes">
+<p>A service that is not critical crashes inside a restricted cluster.
+The engineer asks a lead, and one line sat for days while a wrong
+out-of-memory theory went around. A reader role for that tier lets the
+engineer open the log.</p>
+</aside>
+</section>
+<section id="what-we-want--swap" class="slide level2 vision">
+<h2 class="vision">A partner’s confidential swap failed; partner
+engineering must explain why</h2>
+<p class="depth high">
+In detail
+</p>
+<div class="columns">
+<div class="column before">
+<p><strong>today</strong></p>
+<ul>
+<li>confidential logs may need lead access</li>
+<li>the engineer may lack log access</li>
+<li>broader access may expose unrelated swaps</li>
+</ul>
+</div><div class="column after">
+<p><strong>could feel</strong></p>
+<ul>
+<li>the engineer asks for one trace, by correlation id, for one
+hour</li>
+<li>an approval expires by itself</li>
+<li>the reveal leaves a record</li>
+</ul>
+</div>
+</div>
+<p class="dest">
+That way through is a later version.
+</p>
+<aside class="notes">
+<p>A partner’s confidential swap fails, and someone has to explain why.
+Today the choice is no access, or every other user’s swaps. One way it
+could feel is one trace for one hour, approved, then gone, and the read
+stays on the record. That way through is a later version.</p>
+</aside>
+</section></section>
+<section>
+<section id="rbac-applied"
+class="title-slide slide level1 vision stay-dark">
+<h1 class="vision stay-dark"><span class="prefix">ReBAC:</span> the
+stricter label stays</h1>
+<p class="hook" id="ead-hook-swap">
+A confidential swap fails. The quote is T2. The intent is T1. The trace
+keeps T1. KYT returns passing.
+</p>
+<p class="hook" id="ead-hook-use" hidden>
+A lead inherits T1, T2, and T3. An engineer inherits T2 and T3.
+</p>
+<button id="ead-toggle" class="ead-switch" type="button" aria-pressed="false">
+Roles
+</button>
+<div id="complex-animated-dag" class="diagram">
+<div class="viz-controls">
+<span
+id="ead-swap-controls"><button id="ead-play" type="button">Play</button><button id="ead-replay" type="button">Replay</button><button id="ead-step" type="button">Next
+stage</button><span id="ead-status" aria-live="polite">Three records for
+one failed swap</span></span>
+</div>
+<div id="ead-stage">
+
+</div>
+<div id="ead-legend">
+
+</div>
+<div id="ead-use" hidden="">
+<svg viewBox="0 0 1040 320" role="img" aria-label="Ordinary fields together name one person. A lead inherits T1, T2, and T3. An engineer inherits T2 and T3.">
+<defs><marker id="ead-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#9ca3af"></path></marker></defs>
+<text x="20" y="28">Ordinary fields</text>
+<rect x="20" y="48" width="150" height="40" rx="8" fill="#eef2ff" stroke="#6366f1"></rect>
+<text x="95" y="73" text-anchor="middle">first name</text>
+<rect x="20" y="108" width="150" height="40" rx="8" fill="#eef2ff" stroke="#6366f1"></rect>
+<text x="95" y="133" text-anchor="middle">profession</text>
+<rect x="20" y="168" width="150" height="40" rx="8" fill="#eef2ff" stroke="#6366f1"></rect>
+<text x="95" y="193" text-anchor="middle">age</text>
+<rect x="20" y="228" width="150" height="40" rx="8" fill="#eef2ff" stroke="#6366f1"></rect>
+<text x="95" y="253" text-anchor="middle">IP → city</text>
+<rect x="300" y="128" width="156" height="52" rx="8" fill="#fef2f2" stroke="#dc2626"></rect>
+<text x="378" y="158" text-anchor="middle">one person</text>
+<path d="M170 68 C230 68 240 154 300 154" fill="none" stroke="#6b7280" stroke-width="1.6" marker-end="url(#ead-arrow)"></path>
+<path d="M170 128 C230 128 250 154 300 154" fill="none" stroke="#6b7280" stroke-width="1.6" marker-end="url(#ead-arrow)"></path>
+<path d="M170 188 C230 188 250 154 300 154" fill="none" stroke="#6b7280" stroke-width="1.6" marker-end="url(#ead-arrow)"></path>
+<path d="M170 248 C230 248 240 154 300 154" fill="none" stroke="#6b7280" stroke-width="1.6" marker-end="url(#ead-arrow)"></path>
+<text x="760" y="22" text-anchor="middle">Roles inherit</text>
+<rect x="670" y="32" width="180" height="40" rx="8" fill="#ecfdf5" stroke="#059669"></rect>
+<text x="760" y="57" text-anchor="middle">T3 reader</text>
+<rect x="670" y="96" width="180" height="40" rx="8" fill="#fef3c7" stroke="#d97706"></rect>
+<text x="760" y="121" text-anchor="middle">T2 reader</text>
+<path d="M760 96 L760 72" fill="none" stroke="#6b7280" stroke-width="1.6" marker-end="url(#ead-arrow)"></path>
+<text x="768" y="88">inherits</text>
+<rect x="500" y="176" width="170" height="48" rx="8" fill="#fef3c7" stroke="#d97706"></rect>
+<text x="585" y="196" text-anchor="middle">Engineer</text>
+<text x="585" y="214" text-anchor="middle">T2 and T3</text>
+<rect x="820" y="176" width="170" height="48" rx="8" fill="#fef2f2" stroke="#dc2626"></rect>
+<text x="905" y="196" text-anchor="middle">T1 reader</text>
+<text x="905" y="214" text-anchor="middle">confidential</text>
+<path d="M585 176 C585 150 760 150 760 136" fill="none" stroke="#6b7280" stroke-width="1.6" marker-end="url(#ead-arrow)"></path>
+<path d="M905 176 C905 150 760 150 760 136" fill="none" stroke="#6b7280" stroke-width="1.6" marker-end="url(#ead-arrow)"></path>
+<rect x="820" y="260" width="170" height="48" rx="8" fill="#fef2f2" stroke="#dc2626"></rect>
+<text x="905" y="280" text-anchor="middle">Lead</text>
+<text x="905" y="298" text-anchor="middle">T1, T2, and T3</text>
+<path d="M905 260 L905 224" fill="none" stroke="#6b7280" stroke-width="1.6" marker-end="url(#ead-arrow)"></path>
+<text x="912" y="246">inherits</text> </svg>
+</div>
+</div>
+<p class="dest" id="ead-dest-swap">
+A court order is this lawyer, this one case, for a fixed time.
+</p>
+<p class="dest" id="ead-dest-use" hidden>
+None of those fields is the name. Together they are one person. A lead
+holds T1, T2, and T3. An engineer holds T2 and T3.
+</p>
+<script>
+(()=>{
+ const root=document.getElementById('complex-animated-dag'),stage=root.querySelector('#ead-stage'),play=root.querySelector('#ead-play'),replay=root.querySelector('#ead-replay'),step=root.querySelector('#ead-step'),status=root.querySelector('#ead-status');
+ const t3='var(--green)',t2='var(--yellow)',t1='var(--red)';
+ root.querySelector('#ead-legend').innerHTML=[[t3,'T3 · Route'],[t2,'T2 · Quote'],[t1,'T1 · Intent']].map(([c,name])=>`<span><span style="color:${c}">●</span> ${name}</span>`).join('');
+ const ns='http://www.w3.org/2000/svg',reduce=matchMedia('(prefers-reduced-motion: reduce)');
+ let svg,edges=[],nodes=[],time=0,running=false,frame,last=0,stageIndex=-1;const duration=12000;
+ function add(tag,attrs={},text){const e=document.createElementNS(ns,tag);Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v));if(text!==undefined)e.textContent=text;svg.appendChild(e);return e}
+ function label(x,y,text){return add('text',{x,y,'text-anchor':'middle'},text)}
+ function edge(x1,y1,x2,y2,color,start){const d=`M${x1} ${y1} C${(x1+x2)/2} ${y1} ${(x1+x2)/2} ${y2} ${x2} ${y2}`;add('path',{d,fill:'none',stroke:'var(--border)','stroke-width':1.3});const p=add('path',{d,fill:'none',stroke:color,'stroke-width':3});const length=p.getTotalLength();p.setAttribute('stroke-dasharray',length);const particle=add('circle',{r:5,fill:color});edges.push({p,length,particle,start,duration:3400})}
+ function draw(){
+  const w=stage.clientWidth;if(!w)return;const h=360;
+  stage.replaceChildren();edges=[];nodes=[];svg=document.createElementNS(ns,'svg');svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.setAttribute('role','img');svg.setAttribute('aria-label','A failed confidential swap. The route line is T3, the 1click quote is T2, and the intent is T1. They meet in 1click-manager. The on-call trace keeps T1. KYT returns passing.');stage.appendChild(svg);
+  const sx=128,mx=w/2,ox=w-150;
+  const yRoute=96,yQuote=188,yIntent=280,yMgr=142,yKyt=250;
+  label(sx,36,'DATA');label(mx,36,'SERVICES');label(ox,36,'OUTPUTS');
+  function source(y,tier,name,color){add('circle',{cx:sx,cy:y,r:20,fill:`color-mix(in srgb, ${color} 15%, var(--background))`,stroke:color,'stroke-width':2});label(sx,y+4,tier);label(sx,y+40,name)}
+  source(yRoute,'T3','Route line',t3);source(yQuote,'T2','1click quote',t2);source(yIntent,'T1','Confidential intent',t1);
+  function service(y,name){add('rect',{x:mx-92,y:y-26,width:184,height:52,rx:10,fill:'var(--background)',stroke:'var(--border)'});label(mx,y+4,name);const bar=add('rect',{x:mx-70,y:y+12,width:140,height:3,rx:1.5,fill:'var(--border)'});return bar}
+  const mgr=service(yMgr,'1click-manager'),kyt=service(yKyt,'KYT');
+  nodes.push({mark:mgr,at:3800,color:t1,kind:'bar'},{mark:kyt,at:3800,color:t1,kind:'bar'});
+  function out(y,name){const mark=add('circle',{cx:ox,cy:y,r:22,fill:'var(--background)',stroke:'var(--border)','stroke-width':2});const text=label(ox,y+4,'?');label(ox,y+44,name);return {mark,text}}
+  const trace=out(yMgr,'On-call trace'),result=out(yKyt,'KYT result');
+  nodes.push({mark:trace.mark,text:trace.text,at:10800,color:t1,kind:'tier'},{mark:result.mark,text:result.text,at:10800,color:t3,kind:'pass'});
+  edge(sx+28,yRoute,mx-92,yMgr,t3,0);edge(sx+28,yQuote,mx-92,yMgr,t2,200);edge(sx+28,yIntent,mx-92,yMgr,t1,400);edge(sx+28,yIntent,mx-92,yKyt,t1,600);
+  edge(mx+92,yMgr,ox-30,yMgr,t1,5600);edge(mx+92,yKyt,ox-30,yKyt,t3,6200);
+  update();
+ }
+ function update(){
+  for(const e of edges){const p=Math.max(0,Math.min(1,(time-e.start)/e.duration));e.p.setAttribute('stroke-dashoffset',e.length*(1-p));const pt=e.p.getPointAtLength(Math.max(0,e.length*p));e.particle.setAttribute('cx',pt.x);e.particle.setAttribute('cy',pt.y);e.particle.setAttribute('visibility',p>0&&p<1?'visible':'hidden')}
+  for(const n of nodes){const ready=time>=n.at;if(n.kind==='bar')n.mark.setAttribute('fill',ready?n.color:'var(--border)');else{n.mark.setAttribute('stroke',ready?n.color:'var(--border)');n.mark.setAttribute('fill',ready?`color-mix(in srgb, ${n.color} 18%, var(--background))`:'var(--background)');n.text.textContent=ready?(n.kind==='pass'?'pass':'T1'):'?'}}
+  const index=time>=10800?4:time>=5600?3:time>=3800?2:time>0?1:0;
+  if(index!==stageIndex){stageIndex=index;status.textContent=['Three records for one failed swap','1click-manager receives the quote and the intent','KYT is given the wallet','The trace keeps T1. KYT returns passing','The stricter label stays on the trace'][index]}
+  play.textContent=running?'Pause':time>=duration?'Play again':'Play';step.disabled=time>=duration;
+ }
+ function stop(){running=false;cancelAnimationFrame(frame);update()}
+ function start(){if(time>=duration)time=0;if(reduce.matches){time=duration;update();return}running=true;last=0;update();frame=requestAnimationFrame(tick)}
+ function tick(now){if(!running)return;if(last)time=Math.min(duration,time+(now-last)*2);last=now;update();if(time>=duration)stop();else frame=requestAnimationFrame(tick)}
+ play.addEventListener('click',()=>running?stop():start());replay.addEventListener('click',()=>{stop();time=0;start()});step.addEventListener('click',()=>{stop();time=Math.min(duration,(Math.floor(time/3000)+1)*3000);update()}); document.addEventListener('visibilitychange',()=>{if(document.hidden)stop()});new ResizeObserver(draw).observe(stage);
+ const toggle=document.getElementById('ead-toggle'),swapControls=document.getElementById('ead-swap-controls'),usePanel=document.getElementById('ead-use'),legend=document.getElementById('ead-legend'),hookSwap=document.getElementById('ead-hook-swap'),hookUse=document.getElementById('ead-hook-use'),destSwap=document.getElementById('ead-dest-swap'),destUse=document.getElementById('ead-dest-use');
+ let showingUse=false;
+ function setUse(on){showingUse=on;stage.hidden=on;legend.hidden=on;swapControls.hidden=on;usePanel.hidden=!on;hookSwap.hidden=on;hookUse.hidden=!on;destSwap.hidden=on;destUse.hidden=!on;toggle.textContent=on?'The swap':'Roles';toggle.setAttribute('aria-pressed',String(on));if(on)stop();else{time=0;start()}}
+ toggle.addEventListener('click',()=>setUse(!showingUse));
+ function show(){const s=window.Reveal&&Reveal.getCurrentSlide();if(s&&s.id==='rbac-applied'){if(!showingUse){stop();time=0;start()}}else stop()}
+ window.addEventListener('load',()=>{if(!window.Reveal||!Reveal.on)return;Reveal.on('slidechanged',show);if(Reveal.isReady&&Reveal.isReady())show();else Reveal.on('ready',show)});
+})();
+</script>
+<aside class="notes">
+<p>A partner’s confidential swap fails. The route line is T3.
+1click-manager has the quote, and that quote is T2. The confidential
+intent holds the amount, the IP, and both legs, and that is T1. The
+quote and the intent meet in the trace the on-call opens, and the trace
+keeps T1. KYT was given the wallet and returned passing. Legal sees that
+result. A court order is this lawyer, this one case, for a fixed time. A
+role that can read 1click-manager would open every user’s intents. The
+grant is this person, this trace, for one hour, for the label the trace
+still carries.</p>
+<p><strong>More:</strong></p>
+<p>The graph plays when the slide opens. Replay starts it again. Next
+stage jumps one beat: the three records, then 1click-manager receives
+the quote and the intent, then KYT is given the wallet, then the trace
+keeps T1 and KYT returns passing. Roles switches to two pictures. On the
+left, first name, profession, age, and a city together name one person.
+On the right, T3 reader is the base and T2 reader inherits it. An
+engineer inherits T2, so T2 and T3. A lead inherits T1, so T1, T2, and
+T3. The swap returns with The swap. Down is the 22 Oct note. The next
+face is the same trace as a 1click-manager log, one T2 reader, with the
+amount, the IP, and the seed removed.</p>
+</aside>
+</section>
+<section id="rbac-applied--review"
+class="slide level2 vision stay-dark review">
+<h2 class="vision stay-dark review">Review · why the relationship
+matters</h2>
+<p class="kicker">
+Not for the room. 22 Oct. Remove before the pitch.
+</p>
+<ul>
+<li><strong>Heard.</strong> From annotated data, through data flow and
+control flow, through the DAG, to ReBAC. ReBAC means reasoning about
+access from the relationship graph. The paper stays off the face.</li>
+<li><strong>On the face now.</strong> One failed confidential swap. The
+route line is T3, the 1click quote is T2, the intent is T1. They meet in
+1click-manager. The on-call trace keeps T1. KYT returns passing, and the
+intent rows stay behind. Roles switches to both pictures: ordinary
+fields arrowing into one person, and the inheritance tree: an engineer
+inherits T2 and T3, a lead inherits T1, T2, and T3.</li>
+<li><strong>The grant.</strong> A role that can read 1click-manager
+would open every user’s intents. The grant is this on-call, this one
+trace, for one hour. A court order is the same shape for a lawyer: this
+person, this one case, for a fixed time. Legal is that relationship. It
+is not a tier above T1.</li>
+<li>The seed stays on the refund slide. The name ReBAC is said once,
+here.</li>
+</ul>
+<aside class="notes">
+<p>Review slide for the 22 Oct notes. Skip it in the room.</p>
+</aside>
+</section></section>
+<section id="data-classification"
+class="title-slide slide level1 vision stay-dark">
+<h1 class="vision stay-dark"><span class="prefix">Data
+Classification:</span> a T2 reader sees the log line, minus secret
+fields</h1>
+<div class="columns">
+<div class="column log">
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode json"><code class="sourceCode json"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span> <span class="dt">&quot;svc&quot;</span><span class="fu">:</span> <span class="st">&quot;1click-manager&quot;</span><span class="fu">,</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;tier&quot;</span><span class="fu">:</span> <span class="dv">2</span><span class="fu">,</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;msg&quot;</span><span class="fu">:</span> <span class="st">&quot;swap failed&quot;</span><span class="fu">,</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;corr_id&quot;</span><span class="fu">:</span> <span class="st">&quot;c-7f3a&quot;</span><span class="fu">,</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;s.amount&quot;</span><span class="fu">:</span>  <span class="fu">{</span> <span class="dt">&quot;tier&quot;</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span> <span class="dt">&quot;v&quot;</span><span class="fu">:</span> <span class="st">&quot;…&quot;</span> <span class="fu">},</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;s.ip&quot;</span><span class="fu">:</span>      <span class="fu">{</span> <span class="dt">&quot;tier&quot;</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span> <span class="dt">&quot;v&quot;</span><span class="fu">:</span> <span class="st">&quot;…&quot;</span> <span class="fu">},</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;s.seed&quot;</span><span class="fu">:</span>    <span class="fu">{</span> <span class="dt">&quot;tier&quot;</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span> <span class="dt">&quot;v&quot;</span><span class="fu">:</span> <span class="st">&quot;…&quot;</span> <span class="fu">}</span> <span class="fu">}</span></span></code></pre></div>
+</div><div class="column log">
+<p><strong>A T2 reader sees</strong></p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode json"><code class="sourceCode json"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span> <span class="dt">&quot;svc&quot;</span><span class="fu">:</span> <span class="st">&quot;1click-manager&quot;</span><span class="fu">,</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;tier&quot;</span><span class="fu">:</span> <span class="dv">2</span><span class="fu">,</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;msg&quot;</span><span class="fu">:</span> <span class="st">&quot;swap failed&quot;</span><span class="fu">,</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;corr_id&quot;</span><span class="fu">:</span> <span class="st">&quot;c-7f3a&quot;</span> <span class="fu">}</span></span></code></pre></div>
+<p>the line and the trace, <strong>minus</strong> what is above their
+tier</p>
+</div>
+</div>
+<p class="dest">
+This picture is version 2. Version 1 still labels the whole service.
+</p>
+<aside class="notes">
+<p>On the left is the same failed swap, one 1click-manager log line,
+with an amount, an IP, and a seed. On the right a tier 2 reader sees the
+line and the trace, and those three fields are gone. This picture is
+version 2. Version 1 still labels the whole service.</p>
+</aside>
+</section>
+
+<section id="on-the-record"
+class="title-slide slide level1 vision stay-dark">
+<h1 class="vision stay-dark"><span class="prefix">On the record:</span>
+everything recorded, auditability</h1>
+<p class="hook">
+A lead’s laptop is compromised unknowingly; what could an attacker
+reach?
+</p>
+<div class="columns">
+<div class="column before">
+<p><strong>Tech lead</strong></p>
+<ul>
+<li>his laptop is compromised, and he does not know</li>
+<li>alerts start going off</li>
+<li>the CTO sees him doing suspicious things</li>
+</ul>
+</div><div class="column after">
+<p><strong>the record</strong></p>
+<ul>
+<li>he says he was not even at home</li>
+<li>an investigation is carried out</li>
+<li>we discover we were hacked</li>
+</ul>
+</div>
+</div>
+<p class="dest">
+Because everything is recorded, we have this power.
+</p>
+<aside class="notes">
+<p>The tech lead’s laptop gets hacked, and he does not know. Alerts
+start going off, and the CTO sees the tech lead doing suspicious things.
+The tech lead says he was not even at home, so an investigation is
+carried out. We discover we were hacked. Because everything is recorded,
+we have this power.</p>
+</aside>
+</section>
+
+<section>
+<section id="data-control-flow"
+class="title-slide slide level1 vision stay-dark">
+<h1 class="vision stay-dark"><span class="prefix">Data Flow:</span>
+topological view of data flow</h1>
+<p class="hook">
+Granular data control through Data classification, RBAC Access &amp;
+Auditability combined
+</p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>time</th>
+<th>who</th>
+<th>command</th>
+<th>predicate</th>
+<th>output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>03:12</td>
+<td>on-call</td>
+<td><code>kubectl logs near-listener --since=1h</code></td>
+<td>—</td>
+<td>🔒 sealed</td>
+</tr>
+<tr>
+<td>03:14</td>
+<td>on-call</td>
+<td><code>kubectl exec near-listener -- sh</code></td>
+<td>—</td>
+<td>🔒 sealed</td>
+</tr>
+<tr>
+<td>03:20</td>
+<td>on-call</td>
+<td><code>psql … select count(*) from deposits where …</code></td>
+<td><strong>passing</strong></td>
+<td>🔒 sealed</td>
+</tr>
+<tr>
+<td>09:05</td>
+<td>reviewer</td>
+<td><strong>reveal</strong> 03:20 output · reason: “incident review” · 1
+co-signer</td>
+<td>—</td>
+<td><span class="ok">✓</span> opened, recorded</td>
+</tr>
+</tbody>
+</table>
+<p class="dest">
+The check comes back. The rows stay sealed. This reaches forward into
+security, risk mitigation, Legal investigations, confidential user data
+flows
+</p>
+<aside class="notes">
+<p>Point at the lock, then at the result. At 03:12 and 03:14 the outputs
+stay sealed. At 03:20 the check comes back passing, and the rows stay
+sealed. At 09:05 a reviewer opens that output, with a reason and one
+co-signer, and the opening is recorded. Emergency access still ends by
+itself, someone else is told now, and a named reviewer closes it. That
+is a recorded exception, not a back door. This picture is version 4.</p>
+</aside>
+</section>
+<section id="data-control-flow--review-sealed"
+class="slide level2 vision stay-dark review">
+<h2 class="vision stay-dark review">Review · point at the lock</h2>
+<p class="kicker">
+Not for the room. 22 Oct. Remove before the pitch.
+</p>
+<ul>
+<li><strong>Heard.</strong> The sealed outputs look right. Put the
+reader’s eye on the lock. The output stays locked, and a predicate
+column shows “passing” or “37%”.</li>
+<li><strong>On the face now.</strong> A predicate column. At 03:20 it
+reads passing, and the output stays 🔒 sealed. Under the table: “The
+check comes back. The rows stay sealed. This reaches forward into
+security, risk mitigation, Legal investigations, confidential user data
+flows.”</li>
+<li>The 09:05 reveal stays the exception, with a reason and a co-signer.
+The liquor-store version of this idea stays a down under “Wouldn’t it be
+nice.”</li>
+</ul>
+<aside class="notes">
+<p>Review slide for the 22 Oct notes. Skip it in the room.</p>
+</aside>
+</section>
+<section id="data-control-flow--review-rebac"
+class="slide level2 vision stay-dark review">
+<h2 class="vision stay-dark review">Review · the short slide that names
+ReBAC</h2>
+<p class="kicker">
+Not for the room. 22 Oct. Remove before the pitch.
+</p>
+<ul>
+<li><strong>Heard.</strong> One short slide, after the listener has seen
+annotated data, the flow, and the DAG. “This leads us to ReBAC:
+reasoning about access through the relationship graph.”</li>
+<li><strong>Where it sits now.</strong> On the graph slide, before this
+one. The animation is the failed swap: the quote and the intent meet in
+the on-call trace, and the trace keeps T1. KYT returns passing. This
+table stays the log. Do not add a second definition here.</li>
+<li>Zanzibar is the reference if someone asks for the paper. It stays
+off the face.</li>
+</ul>
+<aside class="notes">
+<p>Review slide for the 22 Oct notes. Skip it in the room.</p>
+</aside>
+</section></section>
+<section>
+<section id="for-them" class="title-slide slide level1 vision">
+<h1 class="vision"><span class="prefix">Long Term Vision:</span>
+Wouldn’t it be nice</h1>
+<p class="kicker">
+Defining a new narritive for the next few years
+</p>
+<p class="hook">
+We haven’t even scratched the surface of the things we can achieve with
+such a system.
+</p>
+<div class="cards">
+<div class="card">
+<h3>
+Crypto Card Market &amp; Data integrity
+</h3>
+<p>
+It is not negotiable to have great control over our data as we expand
+into markets that mirror traditional finance.
+</p>
+</div>
+<div class="card">
+<h3>
+Refunds And Sanctioned Liquidity
+</h3>
+<p>
+A manual refund runs without revealing the data. Partnerships with
+sanctioned liquidity providers run the release.
+</p>
+</div>
+<div class="card">
+<h3>
+Independent team scaling
+</h3>
+<p>
+Legal can have twenty levels. Frontend can stop at a read. Teams scale
+to the hierarchy of their needs.
+</p>
+</div>
+<div class="card">
+<h3>
+An environment for agents
+</h3>
+<p>
+Imagine an environment with agents. The control is granular enough that
+an agent can run without blowing up production.
+</p>
+</div>
+</div>
+<p class="dest">
+If confidentiality is a good business thesis, competition will follow,
+and staying ahead gives us a unique competitive advantage.
+</p>
+<aside class="notes">
+<p>If confidentiality is a good business thesis, competition will
+follow, and staying ahead gives us a unique competitive advantage. Then
+stop.</p>
+<p><strong>More:</strong></p>
+<p>Breath, then the teams card. Legal can have twenty levels. Frontend
+can stop at a read. Teams scale to the hierarchy of their needs. Breath,
+then the agents card. Imagine an environment with agents. Down is the
+key caveat, then the two jobs of the predicate. Do not open agents. That
+line is the last slide, and it is said once.</p>
+</aside>
+</section>
+<section id="for-them--review" class="slide level2 vision review">
+<h2 class="vision review">Review · the two lines he wants kept</h2>
+<p class="kicker">
+Not for the room. 22 Oct. Remove before the pitch.
+</p>
+<ul>
+<li><strong>Heard, keep.</strong> “It is not negotiable to have great
+control over our data.” And, if confidentiality is the business thesis,
+competition follows, and staying ahead is the advantage. He heard “well
+positioned.” He wants “uniquely positioned.”</li>
+<li><strong>On the face now.</strong> The line under the cards is his
+sentence: if confidentiality is a good business thesis, competition will
+follow, and staying ahead gives us a unique competitive advantage.</li>
+<li>“Nuclear to competition” stays off. He offered it as a maybe. The
+confidential-sandbox rework, shown as boxes and without those terms,
+stays on the factories slide. He said he can present that one.</li>
+</ul>
+<aside class="notes">
+<p>Review slide for the 22 Oct notes. Skip it in the room.</p>
+</aside>
+</section>
+<section id="for-them--stops" class="slide level2 vision">
+<h2 class="vision">A hacked laptop meets stops</h2>
+<p class="depth">
+A little more
+</p>
+<ul>
+<li>A stolen laptop finds the sensitive window closed. The grant expires
+on its own.</li>
+<li>A rate limit caps what one window can take. A second person, told
+when the window opens, can see an unusual flow and pause it.</li>
+<li>A hardware key is worth having. It is a stepping stone. A touch
+proves a person was there. It does not prove what they approved. The key
+has no screen.</li>
+<li>On a laptop that is already compromised, the program that talks to
+the key can lie about the payload, and a second touch can be prompted as
+if the first failed. An unexpected second touch is a stop.</li>
+<li>The record is the other half of the same incident. It holds the
+payload that was actually approved, so we can name the users who were in
+what was taken.</li>
+</ul>
+<aside class="notes">
+<p>Say the stops and the key caveat in the same breath. The window
+expires, the rate limit caps it, a second person can pause it. The key
+is better than nothing. A touch is not what was approved. The record is
+how we name who to warn.</p>
+</aside>
+</section>
+<section id="for-them--predicates" class="slide level2 vision">
+<h2 class="vision">Intents, and AML</h2>
+<p class="depth mid">
+More
+</p>
+<ul>
+<li>A liquor store checks that you are old enough. It does not take the
+passport home. A predicate is that move. The answer comes back. The raw
+values do not.</li>
+<li>Confidential intents use it to check a fact about an intent without
+opening the intent.</li>
+<li>The legal platform uses it for AML and KYT. A case officer asks the
+question and gets the result. A lawyer with a court order gets one case,
+for a fixed time.</li>
+<li>Legal exposure is its own axis. It is not a level on the financial
+scale.</li>
+<li>If our own people cannot see the data, a person sitting on a stolen
+laptop cannot see it either.</li>
+</ul>
+<aside class="notes">
+<p>Two jobs, one move. Confidential intents stay closed while a fact is
+checked. AML and KYT on the legal platform get the result, and a court
+order is one case for a fixed time. Legal is its own axis. Data we
+cannot see is data a stolen laptop cannot see.</p>
+</aside>
+</section></section>
+<section>
+<section id="case-refund"
+class="title-slide slide level1 vision stay-dark">
+<h1 class="vision stay-dark"><span class="prefix">Refunds And Sanctioned
+Liquidity</span>Manual Refunds / AML release with one front door.</h1>
+<p class="kicker">
+Case study one
+</p>
+<div class="diagram dot" style="width:100%"><svg
+ viewBox="0.00 0.00 794.00 221.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 217)">
+<title>%3</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-217 790,-217 790,4 -4,4"/>
+<g id="clust1" class="cluster">
+<title>cluster_who</title>
+<polygon fill="none" stroke="#9ca3af" stroke-dasharray="5,2" points="0,-8 0,-205 146,-205 146,-8 0,-8"/>
+<text text-anchor="middle" x="73" y="-189.8" font-family="Helvetica,sans-Serif" font-size="14.00">people and agents</text>
+</g>
+<!-- e -->
+<g id="node1" class="node">
+<title>e</title>
+<path fill="#eef2ff" stroke="#6366f1" d="M98,-174C98,-174 47,-174 47,-174 41,-174 35,-168 35,-162 35,-162 35,-150 35,-150 35,-144 41,-138 47,-138 47,-138 98,-138 98,-138 104,-138 110,-144 110,-150 110,-150 110,-162 110,-162 110,-168 104,-174 98,-174"/>
+<text text-anchor="middle" x="72.5" y="-152.6" font-family="Helvetica,sans-Serif" font-size="13.00">engineer</text>
+</g>
+<!-- gw -->
+<g id="node4" class="node">
+<title>gw</title>
+<path fill="#eef2ff" stroke="#2563eb" d="M459,-120C459,-120 187,-120 187,-120 181,-120 175,-114 175,-108 175,-108 175,-82 175,-82 175,-76 181,-70 187,-70 187,-70 459,-70 459,-70 465,-70 471,-76 471,-82 471,-82 471,-108 471,-108 471,-114 465,-120 459,-120"/>
+<text text-anchor="middle" x="323" y="-105.6" font-family="Helvetica,sans-Serif" font-size="13.00">gateway (bastion)</text>
+<text text-anchor="middle" x="323" y="-91.6" font-family="Helvetica,sans-Serif" font-size="13.00">v4: exec + DB sessions, where we choose</text>
+<text text-anchor="middle" x="323" y="-77.6" font-family="Helvetica,sans-Serif" font-size="13.00">v5: the only path</text>
+</g>
+<!-- e&#45;&gt;gw -->
+<g id="edge1" class="edge">
+<title>e&#45;&gt;gw</title>
+<path fill="none" stroke="#6b7280" d="M110.17,-147C137.43,-140.31 176.14,-130.81 213.02,-121.75"/>
+<polygon fill="#6b7280" stroke="#6b7280" points="213.67,-124.11 219.89,-120.07 212.5,-119.36 213.67,-124.11"/>
+</g>
+<!-- l -->
+<g id="node2" class="node">
+<title>l</title>
+<path fill="#eef2ff" stroke="#6366f1" d="M87.5,-113C87.5,-113 57.5,-113 57.5,-113 51.5,-113 45.5,-107 45.5,-101 45.5,-101 45.5,-89 45.5,-89 45.5,-83 51.5,-77 57.5,-77 57.5,-77 87.5,-77 87.5,-77 93.5,-77 99.5,-83 99.5,-89 99.5,-89 99.5,-101 99.5,-101 99.5,-107 93.5,-113 87.5,-113"/>
+<text text-anchor="middle" x="72.5" y="-91.6" font-family="Helvetica,sans-Serif" font-size="13.00">lead</text>
+</g>
+<!-- l&#45;&gt;gw -->
+<g id="edge2" class="edge">
+<title>l&#45;&gt;gw</title>
+<path fill="none" stroke="#6b7280" d="M99.62,-95C117.01,-95 141.44,-95 167.77,-95"/>
+<polygon fill="#6b7280" stroke="#6b7280" points="167.88,-97.45 174.88,-95 167.88,-92.55 167.88,-97.45"/>
+</g>
+<!-- ag -->
+<g id="node3" class="node">
+<title>ag</title>
+<path fill="#eef2ff" stroke="#6366f1" d="M88,-52C88,-52 57,-52 57,-52 51,-52 45,-46 45,-40 45,-40 45,-28 45,-28 45,-22 51,-16 57,-16 57,-16 88,-16 88,-16 94,-16 100,-22 100,-28 100,-28 100,-40 100,-40 100,-46 94,-52 88,-52"/>
+<text text-anchor="middle" x="72.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="13.00">agent</text>
+</g>
+<!-- ag&#45;&gt;gw -->
+<g id="edge3" class="edge">
+<title>ag&#45;&gt;gw</title>
+<path fill="none" stroke="#6b7280" d="M100.09,-40.53C127.31,-47.21 171.43,-58.04 213.18,-68.29"/>
+<polygon fill="#6b7280" stroke="#6b7280" points="212.74,-70.7 220.12,-69.99 213.91,-65.94 212.74,-70.7"/>
+</g>
+<!-- pr -->
+<g id="node5" class="node">
+<title>pr</title>
+<path fill="#eef2ff" stroke="#6366f1" d="M737.5,-118C737.5,-118 641.5,-118 641.5,-118 635.5,-118 629.5,-112 629.5,-106 629.5,-106 629.5,-94 629.5,-94 629.5,-88 635.5,-82 641.5,-82 641.5,-82 737.5,-82 737.5,-82 743.5,-82 749.5,-88 749.5,-94 749.5,-94 749.5,-106 749.5,-106 749.5,-112 743.5,-118 737.5,-118"/>
+<text text-anchor="middle" x="689.5" y="-103.6" font-family="Helvetica,sans-Serif" font-size="13.00">production</text>
+<text text-anchor="middle" x="689.5" y="-89.6" font-family="Helvetica,sans-Serif" font-size="13.00">exec · DB · logs</text>
+</g>
+<!-- gw&#45;&gt;pr -->
+<g id="edge4" class="edge">
+<title>gw&#45;&gt;pr</title>
+<path fill="none" stroke="#6b7280" d="M471.21,-97.02C523.5,-97.74 579.8,-98.51 621.99,-99.09"/>
+<polygon fill="#6b7280" stroke="#6b7280" points="622.13,-101.54 629.16,-99.19 622.2,-96.64 622.13,-101.54"/>
+</g>
+<!-- at -->
+<g id="node6" class="node">
+<title>at</title>
+<path fill="#eef2ff" stroke="#059669" d="M774,-49C774,-49 605,-49 605,-49 599,-49 593,-43 593,-37 593,-37 593,-25 593,-25 593,-19 599,-13 605,-13 605,-13 774,-13 774,-13 780,-13 786,-19 786,-25 786,-25 786,-37 786,-37 786,-43 780,-49 774,-49"/>
+<text text-anchor="middle" x="689.5" y="-34.6" font-family="Helvetica,sans-Serif" font-size="13.00">refund job</text>
+<text text-anchor="middle" x="689.5" y="-20.6" font-family="Helvetica,sans-Serif" font-size="13.00">(attested: proves its code)</text>
+</g>
+<!-- gw&#45;&gt;at -->
+<g id="edge5" class="edge">
+<title>gw&#45;&gt;at</title>
+<path fill="none" stroke="#6b7280" d="M466.49,-69.98C506.18,-63.01 548.5,-55.58 585.44,-49.09"/>
+<polygon fill="#6b7280" stroke="#6b7280" points="586.29,-51.43 592.76,-47.81 585.44,-46.61 586.29,-51.43"/>
+<text text-anchor="middle" x="532" y="-68.8" font-family="Times,serif" font-size="14.00"> trigger</text>
+</g>
+<!-- s -->
+<g id="node7" class="node">
+<title>s</title>
+<path fill="#fef2f2" stroke="#dc2626" d="M363,-36.73C363,-38.53 345.07,-40 323,-40 300.93,-40 283,-38.53 283,-36.73 283,-36.73 283,-7.27 283,-7.27 283,-5.47 300.93,-4 323,-4 345.07,-4 363,-5.47 363,-7.27 363,-7.27 363,-36.73 363,-36.73"/>
+<path fill="none" stroke="#dc2626" d="M363,-36.73C363,-34.92 345.07,-33.45 323,-33.45 300.93,-33.45 283,-34.92 283,-36.73"/>
+<text text-anchor="middle" x="323" y="-18.6" font-family="Helvetica,sans-Serif" font-size="13.00">seed (T0)</text>
+</g>
+<!-- s&#45;&gt;at -->
+<g id="edge6" class="edge">
+<title>s&#45;&gt;at</title>
+<path fill="none" stroke="#6b7280" d="M363.15,-20.68C412.55,-19.29 500.12,-17.71 575,-21 578.55,-21.16 582.17,-21.34 585.81,-21.55"/>
+<polygon fill="#6b7280" stroke="#6b7280" points="585.73,-24 592.87,-21.97 586.02,-19.1 585.73,-24"/>
+<text text-anchor="middle" x="532" y="-24.8" font-family="Times,serif" font-size="14.00"> used inside</text>
+</g>
+</g>
+</svg>
+</div>
+<p class="dest">
+The person with the role triggers the refund. The seed is used inside
+the job, and no one sees it. Potentially could be expanded to managed
+Liquidity situations for AML funds release
+</p>
+<aside class="notes">
+<p>Today a person goes and sees the keys. There is no other way to
+refund. Case study one is the other way. People and agents come through
+one bastion. In version 4 it records exec and database sessions where we
+choose. In version 5 it is the only path. The refund job is attested, so
+it proves its code. The seed is tier 0, used inside the job, and it
+never comes back to the person who triggered it.</p>
+</aside>
+</section>
+<section id="case-refund--review"
+class="slide level2 vision stay-dark review">
+<h2 class="vision stay-dark review">Review · say today’s refund before
+the door</h2>
+<p class="kicker">
+Not for the room. 22 Oct. Remove before the pitch.
+</p>
+<ul>
+<li><strong>Heard.</strong> Nowadays a person goes and sees the keys.
+There is no mechanism to do the refund any other way.</li>
+<li><strong>On the face now.</strong> The diagram is unchanged except
+the gateway and the refund job, which now use the same solid fill as the
+other boxes. Say this, then the diagram: “Today a person goes and sees
+the keys. There is no other way to refund.” The spoken word is bastion.
+The box still reads “gateway (bastion).”</li>
+</ul>
+<aside class="notes">
+<p>Review slide for the 22 Oct notes. Skip it in the room.</p>
+</aside>
+</section></section>
+<section>
+<section id="case-teams"
+class="title-slide slide level1 vision stay-dark">
+<h1 class="vision stay-dark"><span class="prefix">Independat Team
+Scaling:</span> roles to climb, depth added as needed</h1>
+<p class="kicker">
+Case study two
+</p>
+<div class="columns">
+<div class="column">
+<p><strong>Legal. More sensitivity.</strong></p>
+<div class="diagram dot" style="width:100%"><svg height="300"
+ viewBox="0.00 0.00 213.00 276.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 272)">
+<title>%3</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-272 209,-272 209,4 -4,4"/>
+<!-- a -->
+<g id="node1" class="node">
+<title>a</title>
+<path fill="#eef2ff" stroke="#6366f1" d="M181.5,-36C181.5,-36 23.5,-36 23.5,-36 17.5,-36 11.5,-30 11.5,-24 11.5,-24 11.5,-12 11.5,-12 11.5,-6 17.5,0 23.5,0 23.5,0 181.5,0 181.5,0 187.5,0 193.5,-6 193.5,-12 193.5,-12 193.5,-24 193.5,-24 193.5,-30 187.5,-36 181.5,-36"/>
+<text text-anchor="middle" x="102.5" y="-14.6" font-family="Helvetica,sans-Serif" font-size="13.00">shadow: sees commands</text>
+</g>
+<!-- b -->
+<g id="node2" class="node">
+<title>b</title>
+<path fill="#eef2ff" stroke="#6366f1" d="M154,-94C154,-94 51,-94 51,-94 45,-94 39,-88 39,-82 39,-82 39,-70 39,-70 39,-64 45,-58 51,-58 51,-58 154,-58 154,-58 160,-58 166,-64 166,-70 166,-70 166,-82 166,-82 166,-88 160,-94 154,-94"/>
+<text text-anchor="middle" x="102.5" y="-72.6" font-family="Helvetica,sans-Serif" font-size="13.00">reads T3/T2 logs</text>
+</g>
+<!-- a&#45;&gt;b -->
+<g id="edge1" class="edge">
+<title>a&#45;&gt;b</title>
+<path fill="none" stroke="#6b7280" d="M102.5,-36.11C102.5,-41.1 102.5,-46.64 102.5,-51.94"/>
+<polygon fill="#6b7280" stroke="#6b7280" points="100.4,-52 102.5,-58 104.6,-52 100.4,-52"/>
+</g>
+<!-- c -->
+<g id="node3" class="node">
+<title>c</title>
+<path fill="#eef2ff" stroke="#6366f1" d="M193,-152C193,-152 12,-152 12,-152 6,-152 0,-146 0,-140 0,-140 0,-128 0,-128 0,-122 6,-116 12,-116 12,-116 193,-116 193,-116 199,-116 205,-122 205,-128 205,-128 205,-140 205,-140 205,-146 199,-152 193,-152"/>
+<text text-anchor="middle" x="102.5" y="-130.6" font-family="Helvetica,sans-Serif" font-size="13.00">proposes; a mentor co&#45;signs</text>
+</g>
+<!-- b&#45;&gt;c -->
+<g id="edge2" class="edge">
+<title>b&#45;&gt;c</title>
+<path fill="none" stroke="#6b7280" d="M102.5,-94.11C102.5,-99.1 102.5,-104.64 102.5,-109.94"/>
+<polygon fill="#6b7280" stroke="#6b7280" points="100.4,-110 102.5,-116 104.6,-110 100.4,-110"/>
+</g>
+<!-- d -->
+<g id="node4" class="node">
+<title>d</title>
+<path fill="#eef2ff" stroke="#6366f1" d="M187.5,-210C187.5,-210 17.5,-210 17.5,-210 11.5,-210 5.5,-204 5.5,-198 5.5,-198 5.5,-186 5.5,-186 5.5,-180 11.5,-174 17.5,-174 17.5,-174 187.5,-174 187.5,-174 193.5,-174 199.5,-180 199.5,-186 199.5,-186 199.5,-198 199.5,-198 199.5,-204 193.5,-210 187.5,-210"/>
+<text text-anchor="middle" x="102.5" y="-188.6" font-family="Helvetica,sans-Serif" font-size="13.00">co&#45;signs others&#39; T2 actions</text>
+</g>
+<!-- c&#45;&gt;d -->
+<g id="edge3" class="edge">
+<title>c&#45;&gt;d</title>
+<path fill="none" stroke="#6b7280" d="M102.5,-152.11C102.5,-157.1 102.5,-162.64 102.5,-167.94"/>
+<polygon fill="#6b7280" stroke="#6b7280" points="100.4,-168 102.5,-174 104.6,-168 100.4,-168"/>
+</g>
+<!-- e -->
+<g id="node5" class="node">
+<title>e</title>
+<path fill="#fef3c7" stroke="#d97706" d="M175,-268C175,-268 30,-268 30,-268 24,-268 18,-262 18,-256 18,-256 18,-244 18,-244 18,-238 24,-232 30,-232 30,-232 175,-232 175,-232 181,-232 187,-238 187,-244 187,-244 187,-256 187,-256 187,-262 181,-268 175,-268"/>
+<text text-anchor="middle" x="102.5" y="-246.6" font-family="Helvetica,sans-Serif" font-size="13.00">approves T1 in domain</text>
+</g>
+<!-- d&#45;&gt;e -->
+<g id="edge4" class="edge">
+<title>d&#45;&gt;e</title>
+<path fill="none" stroke="#6b7280" d="M102.5,-210.11C102.5,-215.1 102.5,-220.64 102.5,-225.94"/>
+<polygon fill="#6b7280" stroke="#6b7280" points="100.4,-226 102.5,-232 104.6,-226 100.4,-226"/>
+</g>
+</g>
+</svg>
+</div>
+</div><div class="column">
+<p><strong>Frontend. Less critical.</strong></p>
+<div class="diagram" style="width:100%"><svg height="210" viewBox="0 0 440 200" xmlns="http://www.w3.org/2000/svg">
+<rect x="20" y="16" width="180" height="40" rx="8" fill="#eef2ff" stroke="#6366f1"/>
+<text text-anchor="middle" x="110" y="42" font-size="14">reads T3</text>
+<rect x="250" y="16" width="140" height="40" rx="8" fill="#ecfdf5" stroke="#059669" stroke-dasharray="5,2"/>
+<text text-anchor="middle" x="320" y="42" font-size="14">agent</text>
+<path fill="none" stroke="#6b7280" d="M250,36 L206,36"/>
+<polygon fill="#6b7280" stroke="#6b7280" points="214,31 200,36 214,41"/>
+<text text-anchor="middle" x="228" y="78" font-size="13">loose role</text>
+<rect x="20" y="130" width="230" height="40" rx="8" fill="#eef2ff" stroke="#6366f1"/>
+<text text-anchor="middle" x="135" y="156" font-size="14">shadow: sees commands</text>
+<path fill="none" stroke="#6b7280" d="M110,130 L110,62"/>
+<polygon fill="#6b7280" stroke="#6b7280" points="105,70 110,56 115,70"/>
+</svg></div>
+</div>
+</div>
+<p class="dest">
+Teams scale to the hierarchy of their needs. Legal adds rungs on its
+own, up to approving tier 1. Frontend stops at a loose read.
+</p>
+<aside class="notes">
+<p>Case study two. Teams scale to the hierarchy of their needs. Legal
+handles more sensitive data, so its ladder runs from watching commands
+up to approving tier 1 in the domain. Frontend is less critical, so it
+stops at a loose read. An agent can hold that same loose role and
+contribute, and it sees only what the role allows.</p>
+</aside>
+</section>
+<section id="case-teams--review"
+class="slide level2 vision stay-dark review">
+<h2 class="vision stay-dark review">Review · the line he marked as a
+quote</h2>
+<p class="kicker">
+Not for the room. 22 Oct. Remove before the pitch.
+</p>
+<ul>
+<li><strong>Heard, keep.</strong> Imagine how teams scale independently.
+Imagine legal can have twenty levels. It scales to the hierarchy that
+team needs.</li>
+<li><strong>On the face now.</strong> The line under the diagrams is
+“Teams scale to the hierarchy of their needs.” Legal still climbs to
+tier 1. Frontend still stops at a loose read. Twenty levels stays the
+spoken beat before the diagram.</li>
+</ul>
+<aside class="notes">
+<p>Review slide for the 22 Oct notes. Skip it in the room.</p>
+</aside>
+</section></section>
+<section id="case-card"
+class="title-slide slide level1 vision stay-dark">
+<h1 class="vision stay-dark"><span class="prefix">Crypto Card Market
+&amp; Data integrity:</span> a user under investigation</h1>
+<p class="kicker">
+Case study three
+</p>
+<p class="hook">
+As we are, someone can reach the data, and we cannot see it.
+Infrastructure without a control plane does not enter this market.
+</p>
+<div class="diagram" style="width:100%"><svg height="250" viewBox="0 0 960 250" xmlns="http://www.w3.org/2000/svg">
+<rect x="16" y="12" width="230" height="64" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="2"/>
+<text text-anchor="middle" x="131" y="38" font-size="16">card user</text>
+<text text-anchor="middle" x="131" y="58" font-size="15">sanctioned funds</text>
+<path fill="none" stroke="#6b7280" d="M246,44 L292,44"/>
+<polygon fill="#6b7280" stroke="#6b7280" points="284,39 300,44 284,49"/>
+<rect x="300" y="12" width="250" height="64" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="2"/>
+<text text-anchor="middle" x="425" y="38" font-size="16">their data</text>
+<text text-anchor="middle" x="425" y="58" font-size="15">classified, observed</text>
+<path fill="none" stroke="#6b7280" d="M550,44 L602,44"/>
+<polygon fill="#6b7280" stroke="#6b7280" points="594,39 610,44 594,49"/>
+<rect x="610" y="12" width="230" height="64" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+<text text-anchor="middle" x="725" y="38" font-size="16">only the role</text>
+<text text-anchor="middle" x="725" y="58" font-size="15">a few people</text>
+<path fill="none" stroke="#6b7280" d="M725,76 L725,118"/>
+<path fill="none" stroke="#6b7280" d="M161,118 L804,118"/>
+<path fill="none" stroke="#6b7280" d="M161,118 L161,150"/>
+<polygon fill="#6b7280" stroke="#6b7280" points="156,142 161,158 166,142"/>
+<path fill="none" stroke="#6b7280" d="M480,118 L480,150"/>
+<polygon fill="#6b7280" stroke="#6b7280" points="475,142 480,158 485,142"/>
+<path fill="none" stroke="#6b7280" d="M804,118 L804,150"/>
+<polygon fill="#6b7280" stroke="#6b7280" points="799,142 804,158 809,142"/>
+<rect x="16" y="158" width="290" height="76" rx="8" fill="#ecfdf5" stroke="#059669" stroke-width="2"/>
+<text text-anchor="middle" x="161" y="190" font-size="16">law enforcement</text>
+<text text-anchor="middle" x="161" y="212" font-size="15">the answer, not the rows</text>
+<rect x="335" y="158" width="290" height="76" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+<text text-anchor="middle" x="480" y="190" font-size="16">court case</text>
+<text text-anchor="middle" x="480" y="212" font-size="15">TTL held</text>
+<rect x="654" y="158" width="290" height="76" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="2" stroke-dasharray="5,2"/>
+<text text-anchor="middle" x="799" y="190" font-size="16">other data</text>
+<text text-anchor="middle" x="799" y="212" font-size="15">expires, deleted</text>
+</svg></div>
+<p class="dest">
+We, law enforcement, and the user can trust the handling. That is what
+TradFi expects. Ordinary crypto does not.
+</p>
+<aside class="notes">
+<p>Case study three. Imagine we enter the crypto card market as we are.
+We do not control the data, we cannot see it, and someone can reach all
+of it. There is no data control plane. We can build all the
+infrastructure we want, and without the operation it does not matter.
+Picture the other side. A card user is under investigation for
+sanctioned funds. The data around that user is classified and observed.
+Only the role can open it. Law enforcement gets the answer, not the
+rows. The court case holds that data past its time to live, and the rest
+is deleted when it expires. That is the confidence TradFi expects, and
+ordinary crypto does not give.</p>
+</aside>
+</section>
+
+<section>
+<section id="case-agent"
+class="title-slide slide level1 vision stay-dark">
+<h1 class="vision stay-dark"><span class="prefix">Bullet Proof Sandbox
+To Faciliate Agents:</span> an agent can burn Intents, or run free</h1>
+<p class="kicker">
+Case study four
+</p>
+<p class="hook">
+Anton running an agent can burn down Intents. The agent holds his
+access.
+</p>
+<div class="diagram" style="width:100%"><svg height="230" viewBox="0 0 1040 230" xmlns="http://www.w3.org/2000/svg">
+<text x="16" y="28" font-size="16">today</text>
+<rect x="110" y="44" width="240" height="68" rx="8" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
+<text text-anchor="middle" x="230" y="72" font-size="16">Anton</text>
+<text text-anchor="middle" x="230" y="94" font-size="15">runs an agent</text>
+<path fill="none" stroke="#6b7280" d="M350,78 L398,78"/>
+<polygon fill="#6b7280" stroke="#6b7280" points="390,73 406,78 390,83"/>
+<rect x="406" y="44" width="250" height="68" rx="8" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
+<text text-anchor="middle" x="531" y="72" font-size="16">the agent</text>
+<text text-anchor="middle" x="531" y="94" font-size="15">holds his access</text>
+<path fill="none" stroke="#6b7280" d="M656,78 L704,78"/>
+<polygon fill="#6b7280" stroke="#6b7280" points="696,73 712,78 696,83"/>
+<rect x="712" y="44" width="300" height="68" rx="8" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
+<text text-anchor="middle" x="862" y="72" font-size="16">Intents</text>
+<text text-anchor="middle" x="862" y="94" font-size="15">can burn down</text>
+<text x="16" y="148" font-size="16">the sandbox</text>
+<rect x="110" y="164" width="240" height="56" rx="8" fill="#ecfdf5" stroke="#059669" stroke-width="2" stroke-dasharray="5,2"/>
+<text text-anchor="middle" x="230" y="198" font-size="16">agent</text>
+<path fill="none" stroke="#6b7280" d="M350,192 L398,192"/>
+<polygon fill="#6b7280" stroke="#6b7280" points="390,187 406,192 390,197"/>
+<rect x="406" y="164" width="250" height="56" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="2"/>
+<text text-anchor="middle" x="531" y="198" font-size="16">scoped to a role</text>
+<path fill="none" stroke="#6b7280" d="M656,192 L704,192"/>
+<polygon fill="#6b7280" stroke="#6b7280" points="696,187 712,192 696,197"/>
+<rect x="712" y="150" width="300" height="78" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+<text text-anchor="middle" x="862" y="180" font-size="16">runs free</text>
+<text text-anchor="middle" x="862" y="204" font-size="15">approval expires as needed</text>
+</svg></div>
+<p class="dest">
+Ambiguous issues get solved orders of magnitude quicker. An approval is
+given with an expiry, as needed.
+</p>
+<aside class="notes">
+<p>Case study four. Anton running an agent can burn down Intents,
+because the agent holds his access. In the sandbox the agent is scoped
+to a role, so it can run free, and there is nothing for it to burn down.
+Ambiguous issues get solved orders of magnitude quicker. An approval is
+given with an expiry, as needed. The next slides are that sandbox as a
+room: one door, the agents inside, then the audit.</p>
+</aside>
+</section>
+<section id="case-agent--review"
+class="slide level2 vision stay-dark review">
+<h2 class="vision stay-dark review">Review · pause, then the boxes</h2>
+<p class="kicker">
+Not for the room. 22 Oct. Remove before the pitch.
+</p>
+<ul>
+<li><strong>Heard.</strong> “Imagine an environment with agents.” Then a
+breath. He would rework the confidential sandbox and the agent slide. He
+also offered to present this slide himself. Show the organisational
+capability with boxes. Leave the term MPC off the slide. Confidential
+inference is the box.</li>
+<li><strong>Your words.</strong> The hook is “Anton running an agent can
+burn down Intents. The agent holds his access.” The lower row is “scoped
+to a role.” In the 19 Oct session, at 01:26:42, he described the report
+coming back and nobody seeing the logs. That sentence is on the
+factories slide, not here.</li>
+<li><strong>Suggested.</strong> Breath before the hook. Three boxes,
+spoken left to right: the person, the agent holding only that person’s
+role, the place the inference runs. “The report comes back. The logs
+stay.” The burn-down row stays, as the reason the scope exists.</li>
+<li>“Uniquely positioned” belongs on “Wouldn’t it be nice,” with the
+competition line. It does not replace this picture.</li>
+</ul>
+<aside class="notes">
+<p>Review slide for the 22 Oct notes. Skip it in the room.</p>
+</aside>
+</section></section>
+<section id="sealed-space"
+class="title-slide slide level1 vision stay-dark">
+<h1 class="vision stay-dark"><span class="prefix">Bullet Proof Sandbox
+To Faciliate Agents:</span> a sealed room with one door</h1>
+<div class="diagram" style="width:100%"><svg viewBox="0 0 1150 548" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="space-r" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#F2F2F1"/></marker>
+<marker id="space-u" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#F2F2F1"/></marker>
+<marker id="space-d" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#00EC97"/></marker>
+</defs>
+<rect x="8" y="6" width="1134" height="400" rx="16" fill="#0B0D0D" stroke="#00EC97" stroke-width="1.6" stroke-dasharray="5 5"/>
+<text x="28" y="30" font-size="14" font-weight="500" text-anchor="start" style="fill:#00EC97">ENCRYPTED SPACE  ·  reachable only through the bastion</text>
+<rect x="28" y="46" width="268" height="132" rx="12" fill="#161919" stroke="#262A2A" stroke-width="1.4"/>
+<text x="46" y="92" font-size="20" font-weight="500" text-anchor="start" style="fill:#F2F2F1">Agent enclave</text>
+<text x="46" y="118" font-size="13" font-weight="400" text-anchor="start" style="fill:#8A9090">TEE · AI agents work directly</text>
+<text x="46" y="136" font-size="13" font-weight="400" text-anchor="start" style="fill:#8A9090">on raw data</text>
+<g transform="translate(250,58)" fill="none" stroke="#8A9090" stroke-width="1.6">
+<rect x="3" y="8" width="12" height="9" rx="1.6"/>
+<path d="M6 8 V5.6 a3 3 0 0 1 6 0 V8"/>
+</g>
+<rect x="312" y="86" width="156" height="44" rx="4" fill="#0A2E26"/>
+<g stroke="#00EC97" stroke-width="3">
+<line x1="328" y1="94" x2="328" y2="122"/>
+<line x1="344" y1="94" x2="344" y2="122"/>
+<line x1="360" y1="94" x2="360" y2="122"/>
+<line x1="376" y1="94" x2="376" y2="122"/>
+<line x1="392" y1="94" x2="392" y2="122"/>
+<line x1="408" y1="94" x2="408" y2="122"/>
+<line x1="424" y1="94" x2="424" y2="122"/>
+<line x1="440" y1="94" x2="440" y2="122"/>
+<line x1="456" y1="94" x2="456" y2="122"/>
+</g>
+<text x="390" y="152" font-size="13" font-weight="400" text-anchor="middle" style="fill:#00EC97">encrypted channel</text>
+<rect x="484" y="46" width="268" height="132" rx="12" fill="#161919" stroke="#262A2A" stroke-width="1.4"/>
+<text x="502" y="92" font-size="20" font-weight="500" text-anchor="start" style="fill:#F2F2F1">Sealed LLM</text>
+<text x="502" y="118" font-size="13" font-weight="400" text-anchor="start" style="fill:#8A9090">GPU TEE · prompts and answers</text>
+<text x="502" y="136" font-size="13" font-weight="400" text-anchor="start" style="fill:#8A9090">never leave in clear</text>
+<g transform="translate(706,58)" fill="none" stroke="#8A9090" stroke-width="1.6">
+<rect x="3" y="8" width="12" height="9" rx="1.6"/>
+<path d="M6 8 V5.6 a3 3 0 0 1 6 0 V8"/>
+</g>
+<line x1="162" y1="208" x2="162" y2="184" stroke="#8A9090" stroke-width="1.6" marker-end="url(#space-u)"/>
+<rect x="28" y="214" width="724" height="100" rx="12" fill="#161919" stroke="#E8C24A" stroke-width="1.6"/>
+<text x="48" y="258" font-size="20" font-weight="500" text-anchor="start" style="fill:#F2F2F1">Raw production data and logs</text>
+<text x="48" y="286" font-size="14" font-weight="400" text-anchor="start" style="fill:#8A9090">transactions · auth logs · service logs · read-only for the agents</text>
+
+<rect x="768" y="42" width="352" height="348" rx="12" fill="#161919" stroke="#262A2A" stroke-width="1.4"/>
+<text x="786" y="68" font-size="14" font-weight="500" text-anchor="start" style="fill:#00EC97">ACCESS LOG  ·  hash-chained</text>
+<rect x="778" y="78" width="328" height="30" rx="6" fill="#050606" stroke="#262A2A" stroke-width="1"/>
+<text x="792" y="98" font-size="13" font-weight="400" text-anchor="start" style="fill:#8A9090">#0  genesis</text>
+<text x="1092" y="98" font-size="13" font-weight="400" text-anchor="end" style="fill:#8A9090">0000  ←  ————</text>
+<rect x="8" y="424" width="392" height="116" rx="12" fill="#161919" stroke="#262A2A" stroke-width="1.4"/>
+<text x="26" y="458" font-size="14" font-weight="500" text-anchor="start" style="fill:#F2F2F1">IN  ·  via bastion</text>
+<text x="26" y="484" font-size="14" font-weight="400" text-anchor="start" style="fill:#F2F2F1">Commands and prompts enter here,</text>
+<text x="26" y="504" font-size="14" font-weight="400" text-anchor="start" style="fill:#F2F2F1">and nowhere else.</text>
+<rect x="748" y="424" width="394" height="116" rx="12" fill="#161919" stroke="#262A2A" stroke-width="1.4"/>
+<text x="766" y="458" font-size="14" font-weight="500" text-anchor="start" style="fill:#00EC97">OUT  ·  via bastion</text>
+<text x="766" y="484" font-size="14" font-weight="400" text-anchor="start" style="fill:#F2F2F1">Only checked outputs leave here,</text>
+<text x="766" y="504" font-size="14" font-weight="400" text-anchor="start" style="fill:#F2F2F1">and every one is logged.</text>
+<rect x="428" y="428" width="292" height="108" rx="12" fill="#161919" stroke="#F2F2F1" stroke-width="1.8"/>
+<text x="574" y="468" font-size="18" font-weight="500" text-anchor="middle" style="fill:#F2F2F1">Bastion server</text>
+<text x="574" y="492" font-size="13" font-weight="400" text-anchor="middle" style="fill:#8A9090">the only door: commands in,</text>
+<text x="574" y="510" font-size="13" font-weight="400" text-anchor="middle" style="fill:#8A9090">outputs out</text>
+<line x1="400" y1="482" x2="424" y2="482" stroke="#F2F2F1" stroke-width="1.6" marker-end="url(#space-r)"/>
+<line x1="720" y1="482" x2="744" y2="482" stroke="#00EC97" stroke-width="1.6" marker-end="url(#space-d)"/>
+<line x1="556" y1="424" x2="556" y2="410" stroke="#F2F2F1" stroke-width="1.6" marker-end="url(#space-u)"/>
+<line x1="590" y1="410" x2="590" y2="424" stroke="#00EC97" stroke-width="1.6" marker-end="url(#space-d)"/>
+</svg></div>
+<aside class="notes">
+<p>Here is the sandbox as one room. The dotted line is an encrypted
+space. Inside it, the agents run in a trusted execution enclave, and the
+language model they use runs in its own sealed enclave on the GPU. The
+band between them is an encrypted channel, so prompts and answers never
+travel in the clear. The raw production data and logs live in the same
+space, read-only for the agents. There is one door, the bastion server.
+Commands come in through it, outputs go out through it. On the right the
+access log holds only its genesis entry. Each later entry will include
+the hash of the one before it.</p>
+</aside>
+</section>
+
+<section id="sealed-in"
+class="title-slide slide level1 vision stay-dark">
+<h1 class="vision stay-dark"><span class="prefix">Bullet Proof Sandbox
+To Faciliate Agents:</span> a question goes in through the bastion</h1>
+<div class="diagram" style="width:100%"><svg viewBox="0 0 1150 548" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="qin-r" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#F2F2F1"/></marker>
+<marker id="qin-u" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#F2F2F1"/></marker>
+<marker id="qin-d" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#00EC97"/></marker>
+</defs>
+<rect x="8" y="6" width="1134" height="400" rx="16" fill="#0B0D0D" stroke="#00EC97" stroke-width="1.6" stroke-dasharray="5 5"/>
+<text x="28" y="30" font-size="14" font-weight="500" text-anchor="start" style="fill:#00EC97">ENCRYPTED SPACE  ·  reachable only through the bastion</text>
+<rect x="28" y="46" width="268" height="132" rx="12" fill="#161919" stroke="#262A2A" stroke-width="1.4"/>
+<text x="46" y="92" font-size="20" font-weight="500" text-anchor="start" style="fill:#F2F2F1">Agent enclave</text>
+<text x="46" y="118" font-size="13" font-weight="400" text-anchor="start" style="fill:#8A9090">TEE · AI agents work directly</text>
+<text x="46" y="136" font-size="13" font-weight="400" text-anchor="start" style="fill:#8A9090">on raw data</text>
+<g transform="translate(250,58)" fill="none" stroke="#8A9090" stroke-width="1.6">
+<rect x="3" y="8" width="12" height="9" rx="1.6"/>
+<path d="M6 8 V5.6 a3 3 0 0 1 6 0 V8"/>
+</g>
+<rect x="312" y="86" width="156" height="44" rx="4" fill="#0A2E26"/>
+<g stroke="#00EC97" stroke-width="3">
+<line x1="328" y1="94" x2="328" y2="122"/>
+<line x1="344" y1="94" x2="344" y2="122"/>
+<line x1="360" y1="94" x2="360" y2="122"/>
+<line x1="376" y1="94" x2="376" y2="122"/>
+<line x1="392" y1="94" x2="392" y2="122"/>
+<line x1="408" y1="94" x2="408" y2="122"/>
+<line x1="424" y1="94" x2="424" y2="122"/>
+<line x1="440" y1="94" x2="440" y2="122"/>
+<line x1="456" y1="94" x2="456" y2="122"/>
+</g>
+<text x="390" y="152" font-size="13" font-weight="400" text-anchor="middle" style="fill:#00EC97">encrypted channel</text>
+<rect x="484" y="46" width="268" height="132" rx="12" fill="#161919" stroke="#262A2A" stroke-width="1.4"/>
+<text x="502" y="92" font-size="20" font-weight="500" text-anchor="start" style="fill:#F2F2F1">Sealed LLM</text>
+<text x="502" y="118" font-size="13" font-weight="400" text-anchor="start" style="fill:#8A9090">GPU TEE · prompts and answers</text>
+<text x="502" y="136" font-size="13" font-weight="400" text-anchor="start" style="fill:#8A9090">never leave in clear</text>
+<g transform="translate(706,58)" fill="none" stroke="#8A9090" stroke-width="1.6">
+<rect x="3" y="8" width="12" height="9" rx="1.6"/>
+<path d="M6 8 V5.6 a3 3 0 0 1 6 0 V8"/>
+</g>
+<line x1="162" y1="208" x2="162" y2="184" stroke="#8A9090" stroke-width="1.6" marker-end="url(#qin-u)"/>
+<rect x="28" y="214" width="724" height="100" rx="12" fill="#161919" stroke="#E8C24A" stroke-width="1.6"/>
+<text x="48" y="258" font-size="20" font-weight="500" text-anchor="start" style="fill:#F2F2F1">Raw production data and logs</text>
+<text x="48" y="286" font-size="14" font-weight="400" text-anchor="start" style="fill:#8A9090">transactions · auth logs · service logs · read-only for the agents</text>
+
+<rect x="768" y="42" width="352" height="348" rx="12" fill="#161919" stroke="#262A2A" stroke-width="1.4"/>
+<text x="786" y="68" font-size="14" font-weight="500" text-anchor="start" style="fill:#00EC97">ACCESS LOG  ·  hash-chained</text>
+<rect x="778" y="78" width="328" height="30" rx="6" fill="#050606" stroke="#262A2A" stroke-width="1"/>
+<text x="792" y="98" font-size="13" font-weight="400" text-anchor="start" style="fill:#8A9090">#0  genesis</text>
+<text x="1092" y="98" font-size="13" font-weight="400" text-anchor="end" style="fill:#8A9090">0000  ←  ————</text>
+<rect x="778" y="114" width="328" height="30" rx="6" fill="#050606" stroke="#262A2A" stroke-width="1"/>
+<text x="792" y="134" font-size="13" font-weight="400" text-anchor="start" style="fill:#8A9090">#1  IN</text>
+<text x="1092" y="134" font-size="13" font-weight="400" text-anchor="end" style="fill:#8A9090">3f9a  ←  0000</text>
+<rect x="8" y="424" width="392" height="116" rx="12" fill="#161919" stroke="#262A2A" stroke-width="1.4"/>
+<text x="26" y="458" font-size="14" font-weight="500" text-anchor="start" style="fill:#F2F2F1">IN  ·  via bastion</text>
+<text x="26" y="484" font-size="14" font-weight="400" text-anchor="start" style="fill:#F2F2F1">“Agents: investigate the raw data</text>
+<text x="26" y="504" font-size="14" font-weight="400" text-anchor="start" style="fill:#F2F2F1">and find who caused the incident.”</text>
+<rect x="748" y="424" width="394" height="116" rx="12" fill="#161919" stroke="#262A2A" stroke-width="1.4"/>
+<text x="766" y="458" font-size="14" font-weight="500" text-anchor="start" style="fill:#00EC97">OUT  ·  via bastion</text>
+<text x="766" y="484" font-size="14" font-weight="400" text-anchor="start" style="fill:#F2F2F1">Nothing yet. The agents are</text>
+<text x="766" y="504" font-size="14" font-weight="400" text-anchor="start" style="fill:#F2F2F1">working inside.</text>
+<rect x="428" y="428" width="292" height="108" rx="12" fill="#161919" stroke="#F2F2F1" stroke-width="1.8"/>
+<text x="574" y="468" font-size="18" font-weight="500" text-anchor="middle" style="fill:#F2F2F1">Bastion server</text>
+<text x="574" y="492" font-size="13" font-weight="400" text-anchor="middle" style="fill:#8A9090">the only door: commands in,</text>
+<text x="574" y="510" font-size="13" font-weight="400" text-anchor="middle" style="fill:#8A9090">outputs out</text>
+<line x1="400" y1="482" x2="424" y2="482" stroke="#F2F2F1" stroke-width="1.6" marker-end="url(#qin-r)"/>
+<line x1="720" y1="482" x2="744" y2="482" stroke="#00EC97" stroke-width="1.6" marker-end="url(#qin-d)"/>
+<line x1="556" y1="424" x2="556" y2="410" stroke="#F2F2F1" stroke-width="1.6" marker-end="url(#qin-u)"/>
+<line x1="590" y1="410" x2="590" y2="424" stroke="#00EC97" stroke-width="1.6" marker-end="url(#qin-d)"/>
+</svg></div>
+<aside class="notes">
+<p>An investigation starts. Someone sends a prompt through the bastion:
+agents, look at the raw data and find who caused this incident. The
+bastion lets it in, and the access log grows by one entry, chained to
+the genesis entry. Inside the sealed space the agents work on the raw
+production data, using the sealed model over the encrypted channel.
+Nothing has come out yet.</p>
+</aside>
+</section>
+
+<section id="sealed-ask"
+class="title-slide slide level1 vision stay-dark">
+<h1 class="vision stay-dark"><span class="prefix">Bullet Proof Sandbox
+To Faciliate Agents:</span> a finding comes out, not the data</h1>
+<div class="diagram" style="width:100%"><svg viewBox="0 0 1150 548" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="ask-r" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#F2F2F1"/></marker>
+<marker id="ask-u" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#F2F2F1"/></marker>
+<marker id="ask-d" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#00EC97"/></marker>
+</defs>
+<rect x="8" y="6" width="1134" height="400" rx="16" fill="#0B0D0D" stroke="#00EC97" stroke-width="1.6" stroke-dasharray="5 5"/>
+<text x="28" y="30" font-size="14" font-weight="500" text-anchor="start" style="fill:#00EC97">ENCRYPTED SPACE  ·  reachable only through the bastion</text>
+<rect x="28" y="46" width="268" height="132" rx="12" fill="#161919" stroke="#262A2A" stroke-width="1.4"/>
+<text x="46" y="92" font-size="20" font-weight="500" text-anchor="start" style="fill:#F2F2F1">Agent enclave</text>
+<text x="46" y="118" font-size="13" font-weight="400" text-anchor="start" style="fill:#8A9090">TEE · AI agents work directly</text>
+<text x="46" y="136" font-size="13" font-weight="400" text-anchor="start" style="fill:#8A9090">on raw data</text>
+<g transform="translate(250,58)" fill="none" stroke="#8A9090" stroke-width="1.6">
+<rect x="3" y="8" width="12" height="9" rx="1.6"/>
+<path d="M6 8 V5.6 a3 3 0 0 1 6 0 V8"/>
+</g>
+<rect x="312" y="86" width="156" height="44" rx="4" fill="#0A2E26"/>
+<g stroke="#00EC97" stroke-width="3">
+<line x1="328" y1="94" x2="328" y2="122"/>
+<line x1="344" y1="94" x2="344" y2="122"/>
+<line x1="360" y1="94" x2="360" y2="122"/>
+<line x1="376" y1="94" x2="376" y2="122"/>
+<line x1="392" y1="94" x2="392" y2="122"/>
+<line x1="408" y1="94" x2="408" y2="122"/>
+<line x1="424" y1="94" x2="424" y2="122"/>
+<line x1="440" y1="94" x2="440" y2="122"/>
+<line x1="456" y1="94" x2="456" y2="122"/>
+</g>
+<text x="390" y="152" font-size="13" font-weight="400" text-anchor="middle" style="fill:#00EC97">encrypted channel</text>
+<rect x="484" y="46" width="268" height="132" rx="12" fill="#161919" stroke="#262A2A" stroke-width="1.4"/>
+<text x="502" y="92" font-size="20" font-weight="500" text-anchor="start" style="fill:#F2F2F1">Sealed LLM</text>
+<text x="502" y="118" font-size="13" font-weight="400" text-anchor="start" style="fill:#8A9090">GPU TEE · prompts and answers</text>
+<text x="502" y="136" font-size="13" font-weight="400" text-anchor="start" style="fill:#8A9090">never leave in clear</text>
+<g transform="translate(706,58)" fill="none" stroke="#8A9090" stroke-width="1.6">
+<rect x="3" y="8" width="12" height="9" rx="1.6"/>
+<path d="M6 8 V5.6 a3 3 0 0 1 6 0 V8"/>
+</g>
+<line x1="162" y1="208" x2="162" y2="184" stroke="#8A9090" stroke-width="1.6" marker-end="url(#ask-u)"/>
+<rect x="28" y="214" width="724" height="100" rx="12" fill="#161919" stroke="#E8C24A" stroke-width="1.6"/>
+<text x="48" y="258" font-size="20" font-weight="500" text-anchor="start" style="fill:#F2F2F1">Raw production data and logs</text>
+<text x="48" y="286" font-size="14" font-weight="400" text-anchor="start" style="fill:#8A9090">transactions · auth logs · service logs · read-only for the agents</text>
+<text x="36" y="372" font-size="13" font-weight="400" text-anchor="start" style="fill:#00EC97">This loop may repeat: ask for more data, another method, or higher confidence.</text>
+<rect x="768" y="42" width="352" height="348" rx="12" fill="#161919" stroke="#262A2A" stroke-width="1.4"/>
+<text x="786" y="68" font-size="14" font-weight="500" text-anchor="start" style="fill:#00EC97">ACCESS LOG  ·  hash-chained</text>
+<rect x="778" y="78" width="328" height="30" rx="6" fill="#050606" stroke="#262A2A" stroke-width="1"/>
+<text x="792" y="98" font-size="13" font-weight="400" text-anchor="start" style="fill:#8A9090">#0  genesis</text>
+<text x="1092" y="98" font-size="13" font-weight="400" text-anchor="end" style="fill:#8A9090">0000  ←  ————</text>
+<rect x="778" y="114" width="328" height="30" rx="6" fill="#050606" stroke="#262A2A" stroke-width="1"/>
+<text x="792" y="134" font-size="13" font-weight="400" text-anchor="start" style="fill:#8A9090">#1  IN</text>
+<text x="1092" y="134" font-size="13" font-weight="400" text-anchor="end" style="fill:#8A9090">3f9a  ←  0000</text>
+<rect x="778" y="150" width="328" height="30" rx="6" fill="#050606" stroke="#262A2A" stroke-width="1"/>
+<text x="792" y="170" font-size="13" font-weight="400" text-anchor="start" style="fill:#00EC97">#2  OUT low</text>
+<text x="1092" y="170" font-size="13" font-weight="400" text-anchor="end" style="fill:#00EC97">8c21  ←  3f9a</text>
+<rect x="778" y="186" width="328" height="30" rx="6" fill="#050606" stroke="#262A2A" stroke-width="1"/>
+<text x="792" y="206" font-size="13" font-weight="400" text-anchor="start" style="fill:#8A9090">#3  IN</text>
+<text x="1092" y="206" font-size="13" font-weight="400" text-anchor="end" style="fill:#8A9090">d47e  ←  8c21</text>
+<rect x="778" y="222" width="328" height="30" rx="6" fill="#050606" stroke="#262A2A" stroke-width="1"/>
+<text x="792" y="242" font-size="13" font-weight="400" text-anchor="start" style="fill:#00EC97">#4  OUT low</text>
+<text x="1092" y="242" font-size="13" font-weight="400" text-anchor="end" style="fill:#00EC97">1b06  ←  d47e</text>
+<rect x="8" y="424" width="392" height="116" rx="12" fill="#161919" stroke="#262A2A" stroke-width="1.4"/>
+<text x="26" y="458" font-size="14" font-weight="500" text-anchor="start" style="fill:#F2F2F1">IN  ·  via bastion</text>
+<text x="26" y="484" font-size="14" font-weight="400" text-anchor="start" style="fill:#F2F2F1">“Cross-check with a second method.”</text>
+<rect x="748" y="424" width="394" height="116" rx="12" fill="#161919" stroke="#262A2A" stroke-width="1.4"/>
+<text x="766" y="458" font-size="14" font-weight="500" text-anchor="start" style="fill:#00EC97">OUT  ·  sensitivity low</text>
+<text x="766" y="484" font-size="14" font-weight="400" text-anchor="start" style="fill:#F2F2F1">Statistical test, one account.</text>
+<text x="766" y="504" font-size="14" font-weight="400" text-anchor="start" style="fill:#F2F2F1">Confidence 91%, then 97%.</text>
+<text x="766" y="524" font-size="14" font-weight="400" text-anchor="start" style="fill:#F2F2F1">No raw records.</text>
+<rect x="428" y="428" width="292" height="108" rx="12" fill="#161919" stroke="#F2F2F1" stroke-width="1.8"/>
+<text x="574" y="468" font-size="18" font-weight="500" text-anchor="middle" style="fill:#F2F2F1">Bastion server</text>
+<text x="574" y="492" font-size="13" font-weight="400" text-anchor="middle" style="fill:#8A9090">the only door: commands in,</text>
+<text x="574" y="510" font-size="13" font-weight="400" text-anchor="middle" style="fill:#8A9090">outputs out</text>
+<line x1="400" y1="482" x2="424" y2="482" stroke="#F2F2F1" stroke-width="1.6" marker-end="url(#ask-r)"/>
+<line x1="720" y1="482" x2="744" y2="482" stroke="#00EC97" stroke-width="1.6" marker-end="url(#ask-d)"/>
+<line x1="556" y1="424" x2="556" y2="410" stroke="#F2F2F1" stroke-width="1.6" marker-end="url(#ask-u)"/>
+<line x1="590" y1="410" x2="590" y2="424" stroke="#00EC97" stroke-width="1.6" marker-end="url(#ask-d)"/>
+</svg></div>
+<aside class="notes">
+<p>What leaves is not the data. A statistical method found one account,
+with a stated confidence. It holds only aggregates and a method, so it
+is marked low sensitivity and is safe to read. They ask again:
+cross-check with a second method. Confidence rises from 91 percent to 97
+percent. The loop can repeat. Every exchange is another link, four so
+far after the genesis entry.</p>
+</aside>
+</section>
+
+<section id="sealed-reveal"
+class="title-slide slide level1 vision stay-dark">
+<h1 class="vision stay-dark"><span class="prefix">Bullet Proof Sandbox
+To Faciliate Agents:</span> confidence is high enough: reveal</h1>
+<div class="diagram" style="width:100%"><svg viewBox="0 0 1150 548" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="rev-r" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#F2F2F1"/></marker>
+<marker id="rev-u" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#F2F2F1"/></marker>
+<marker id="rev-d" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#00EC97"/></marker>
+</defs>
+<rect x="8" y="6" width="1134" height="400" rx="16" fill="#0B0D0D" stroke="#00EC97" stroke-width="1.6" stroke-dasharray="5 5"/>
+<text x="28" y="30" font-size="14" font-weight="500" text-anchor="start" style="fill:#00EC97">ENCRYPTED SPACE  ·  reachable only through the bastion</text>
+<rect x="28" y="46" width="268" height="132" rx="12" fill="#161919" stroke="#262A2A" stroke-width="1.4"/>
+<text x="46" y="92" font-size="20" font-weight="500" text-anchor="start" style="fill:#F2F2F1">Agent enclave</text>
+<text x="46" y="118" font-size="13" font-weight="400" text-anchor="start" style="fill:#8A9090">TEE · AI agents work directly</text>
+<text x="46" y="136" font-size="13" font-weight="400" text-anchor="start" style="fill:#8A9090">on raw data</text>
+<g transform="translate(250,58)" fill="none" stroke="#8A9090" stroke-width="1.6">
+<rect x="3" y="8" width="12" height="9" rx="1.6"/>
+<path d="M6 8 V5.6 a3 3 0 0 1 6 0 V8"/>
+</g>
+<rect x="312" y="86" width="156" height="44" rx="4" fill="#0A2E26"/>
+<g stroke="#00EC97" stroke-width="3">
+<line x1="328" y1="94" x2="328" y2="122"/>
+<line x1="344" y1="94" x2="344" y2="122"/>
+<line x1="360" y1="94" x2="360" y2="122"/>
+<line x1="376" y1="94" x2="376" y2="122"/>
+<line x1="392" y1="94" x2="392" y2="122"/>
+<line x1="408" y1="94" x2="408" y2="122"/>
+<line x1="424" y1="94" x2="424" y2="122"/>
+<line x1="440" y1="94" x2="440" y2="122"/>
+<line x1="456" y1="94" x2="456" y2="122"/>
+</g>
+<text x="390" y="152" font-size="13" font-weight="400" text-anchor="middle" style="fill:#00EC97">encrypted channel</text>
+<rect x="484" y="46" width="268" height="132" rx="12" fill="#161919" stroke="#262A2A" stroke-width="1.4"/>
+<text x="502" y="92" font-size="20" font-weight="500" text-anchor="start" style="fill:#F2F2F1">Sealed LLM</text>
+<text x="502" y="118" font-size="13" font-weight="400" text-anchor="start" style="fill:#8A9090">GPU TEE · prompts and answers</text>
+<text x="502" y="136" font-size="13" font-weight="400" text-anchor="start" style="fill:#8A9090">never leave in clear</text>
+<g transform="translate(706,58)" fill="none" stroke="#8A9090" stroke-width="1.6">
+<rect x="3" y="8" width="12" height="9" rx="1.6"/>
+<path d="M6 8 V5.6 a3 3 0 0 1 6 0 V8"/>
+</g>
+<line x1="162" y1="208" x2="162" y2="184" stroke="#8A9090" stroke-width="1.6" marker-end="url(#rev-u)"/>
+<rect x="28" y="214" width="724" height="100" rx="12" fill="#161919" stroke="#E8C24A" stroke-width="1.6"/>
+<text x="48" y="258" font-size="20" font-weight="500" text-anchor="start" style="fill:#F2F2F1">Raw production data and logs</text>
+<text x="48" y="286" font-size="14" font-weight="400" text-anchor="start" style="fill:#8A9090">transactions · auth logs · service logs · read-only for the agents</text>
+
+<rect x="768" y="42" width="352" height="348" rx="12" fill="#161919" stroke="#262A2A" stroke-width="1.4"/>
+<text x="786" y="68" font-size="14" font-weight="500" text-anchor="start" style="fill:#00EC97">ACCESS LOG  ·  hash-chained</text>
+<rect x="778" y="78" width="328" height="30" rx="6" fill="#050606" stroke="#262A2A" stroke-width="1"/>
+<text x="792" y="98" font-size="13" font-weight="400" text-anchor="start" style="fill:#8A9090">#0  genesis</text>
+<text x="1092" y="98" font-size="13" font-weight="400" text-anchor="end" style="fill:#8A9090">0000  ←  ————</text>
+<rect x="778" y="114" width="328" height="30" rx="6" fill="#050606" stroke="#262A2A" stroke-width="1"/>
+<text x="792" y="134" font-size="13" font-weight="400" text-anchor="start" style="fill:#8A9090">#1  IN</text>
+<text x="1092" y="134" font-size="13" font-weight="400" text-anchor="end" style="fill:#8A9090">3f9a  ←  0000</text>
+<rect x="778" y="150" width="328" height="30" rx="6" fill="#050606" stroke="#262A2A" stroke-width="1"/>
+<text x="792" y="170" font-size="13" font-weight="400" text-anchor="start" style="fill:#00EC97">#2  OUT low</text>
+<text x="1092" y="170" font-size="13" font-weight="400" text-anchor="end" style="fill:#00EC97">8c21  ←  3f9a</text>
+<rect x="778" y="186" width="328" height="30" rx="6" fill="#050606" stroke="#262A2A" stroke-width="1"/>
+<text x="792" y="206" font-size="13" font-weight="400" text-anchor="start" style="fill:#8A9090">#3  IN</text>
+<text x="1092" y="206" font-size="13" font-weight="400" text-anchor="end" style="fill:#8A9090">d47e  ←  8c21</text>
+<rect x="778" y="222" width="328" height="30" rx="6" fill="#050606" stroke="#262A2A" stroke-width="1"/>
+<text x="792" y="242" font-size="13" font-weight="400" text-anchor="start" style="fill:#00EC97">#4  OUT low</text>
+<text x="1092" y="242" font-size="13" font-weight="400" text-anchor="end" style="fill:#00EC97">1b06  ←  d47e</text>
+<rect x="778" y="258" width="328" height="30" rx="6" fill="#050606" stroke="#262A2A" stroke-width="1"/>
+<text x="792" y="278" font-size="13" font-weight="400" text-anchor="start" style="fill:#8A9090">#5  IN</text>
+<text x="1092" y="278" font-size="13" font-weight="400" text-anchor="end" style="fill:#8A9090">9d0e  ←  1b06</text>
+<rect x="778" y="294" width="328" height="30" rx="6" fill="#050606" stroke="#262A2A" stroke-width="1"/>
+<text x="792" y="314" font-size="13" font-weight="400" text-anchor="start" style="fill:#D97066">#6  OUT sealed</text>
+<text x="1092" y="314" font-size="13" font-weight="400" text-anchor="end" style="fill:#D97066">51b7  ←  9d0e</text>
+<rect x="8" y="424" width="392" height="116" rx="12" fill="#161919" stroke="#262A2A" stroke-width="1.4"/>
+<text x="26" y="458" font-size="14" font-weight="500" text-anchor="start" style="fill:#F2F2F1">IN  ·  via bastion</text>
+<text x="26" y="484" font-size="14" font-weight="400" text-anchor="start" style="fill:#F2F2F1">“Confidence clears the bar. Reveal</text>
+<text x="26" y="504" font-size="14" font-weight="400" text-anchor="start" style="fill:#F2F2F1">the account behind the finding.”</text>
+<rect x="748" y="424" width="394" height="116" rx="12" fill="#161919" stroke="#262A2A" stroke-width="1.4"/>
+<text x="766" y="458" font-size="14" font-weight="500" text-anchor="start" style="fill:#D97066">OUT  ·  sealed with the log</text>
+<text x="766" y="484" font-size="14" font-weight="400" text-anchor="start" style="fill:#F2F2F1">Reviewers only. Content sealed.</text>
+<text x="766" y="504" font-size="14" font-weight="400" text-anchor="start" style="fill:#F2F2F1">Log entry #6.</text>
+<rect x="428" y="428" width="292" height="108" rx="12" fill="#161919" stroke="#F2F2F1" stroke-width="1.8"/>
+<text x="574" y="468" font-size="18" font-weight="500" text-anchor="middle" style="fill:#F2F2F1">Bastion server</text>
+<text x="574" y="492" font-size="13" font-weight="400" text-anchor="middle" style="fill:#8A9090">the only door: commands in,</text>
+<text x="574" y="510" font-size="13" font-weight="400" text-anchor="middle" style="fill:#8A9090">outputs out</text>
+<line x1="400" y1="482" x2="424" y2="482" stroke="#F2F2F1" stroke-width="1.6" marker-end="url(#rev-r)"/>
+<line x1="720" y1="482" x2="744" y2="482" stroke="#00EC97" stroke-width="1.6" marker-end="url(#rev-d)"/>
+<line x1="556" y1="424" x2="556" y2="410" stroke="#F2F2F1" stroke-width="1.6" marker-end="url(#rev-u)"/>
+<line x1="590" y1="410" x2="590" y2="424" stroke="#00EC97" stroke-width="1.6" marker-end="url(#rev-d)"/>
+</svg></div>
+<aside class="notes">
+<p>The evidence is strong enough, so they ask for the account behind the
+finding. This is the first output that contains the sensitive field. It
+goes only to the approved reviewers. The log marks it sealed: the entry
+says that it happened, who received it, and its hash. It does not keep
+the account in the clear. The request and the sealed release both join
+the chain.</p>
+</aside>
+</section>
+
+<section id="sealed-audit"
+class="title-slide slide level1 vision stay-dark">
+<h1 class="vision stay-dark"><span class="prefix">Bullet Proof Sandbox
+To Faciliate Agents:</span> the audit: inputs visible, sealed outputs
+stay sealed</h1>
+<div class="diagram" style="width:100%"><svg viewBox="0 0 1150 150" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="aud-r" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#F2F2F1"/></marker>
+<marker id="aud-c" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#00EC97"/></marker>
+</defs>
+<rect x="8" y="16" width="392" height="118" rx="12" fill="#161919" stroke="#262A2A" stroke-width="1.4"/>
+<text x="26" y="58" font-size="15" font-weight="500" text-anchor="start" style="fill:#F2F2F1">IN  ·  via bastion</text>
+<text x="26" y="90" font-size="15" font-weight="400" text-anchor="start" style="fill:#F2F2F1">“Show us the access audit log.”</text>
+<rect x="428" y="22" width="292" height="106" rx="12" fill="#161919" stroke="#F2F2F1" stroke-width="1.8"/>
+<text x="574" y="68" font-size="18" font-weight="500" text-anchor="middle" style="fill:#F2F2F1">Bastion server</text>
+<text x="574" y="96" font-size="14" font-weight="400" text-anchor="middle" style="fill:#8A9090">the only door</text>
+<rect x="748" y="16" width="394" height="118" rx="12" fill="#0B0D0D" stroke="#00EC97" stroke-width="1.6" stroke-dasharray="5 5"/>
+<text x="766" y="58" font-size="15" font-weight="500" text-anchor="start" style="fill:#00EC97">ENCRYPTED SPACE</text>
+<text x="766" y="88" font-size="14" font-weight="400" text-anchor="start" style="fill:#F2F2F1">reads its hash-chained log,</text>
+<text x="766" y="108" font-size="14" font-weight="400" text-anchor="start" style="fill:#F2F2F1">entries #0–#7</text>
+<line x1="400" y1="75" x2="424" y2="75" stroke="#F2F2F1" stroke-width="1.6" marker-end="url(#aud-r)"/>
+<line x1="720" y1="75" x2="744" y2="75" stroke="#00EC97" stroke-width="1.6" marker-end="url(#aud-c)"/>
+</svg></div>
+<p class="audit-caption">
+OUT · via bastion · access audit log
+</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>#</th>
+<th>Input, visible to auditors</th>
+<th>Output</th>
+<th>Safe to reveal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Investigate the raw data: who caused the incident?</td>
+<td>Test result, confidence 91%</td>
+<td>low · aggregates only · log #2</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Cross-check with a second method.</td>
+<td>Same account, confidence 97%</td>
+<td>low · aggregates only · log #4</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Reveal the account behind the finding.</td>
+<td><span class="sealed">SEALED</span> · see log #6</td>
+<td>1 account ID · 2 reviewers</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Show us the access audit log.</td>
+<td>this table</td>
+<td>metadata only · log #8</td>
+</tr>
+</tbody>
+</table>
+<p class="dest">
+Auditors see every question, and the metadata of every answer. A sealed
+output shows that it happened, to whom, and its log hash.
+</p>
+<aside class="notes">
+<p>An auditor sends one more prompt through the bastion: show us the
+access audit log. What comes back, through the same door, is this table.
+The input column is the prompts, in the clear. The early findings are
+low sensitivity, so the method and the confidence are on the page. The
+reveal is sealed, with a pointer to its log entry, what kind of data
+left, how much, and who received it. The last row is this table itself.
+Every row is a link in the hash chain, so an access cannot be added or
+removed after the fact.</p>
+</aside>
+</section>
+
+<section>
+<section id="where-we-are"
+class="title-slide slide level1 concept light">
+<h1 class="concept light"><span class="prefix">Current state of NEAR
+Intents:</span> Where we are</h1>
+<p class="kicker">
+Why this vision.
+</p>
+<p class="hook">
+Let’s ground ourselves back to reality.
+</p>
+<div class="cards">
+<div class="card">
+<h3>
+It waits on a handful of people
+</h3>
+<p>
+Debugging, research, and engineering throughput stop with them.
+</p>
+</div>
+<div class="card">
+<h3>
+No role, so only the tenured learn it
+</h3>
+<p>
+Access never expires. Only the longest-tenured touch production.
+</p>
+</div>
+<div class="card">
+<h3>
+The procedure is the exposure
+</h3>
+<p>
+A refund prints the seed. One swap opens every user, or the partner gets
+no answer.
+</p>
+</div>
+<div class="card">
+<h3>
+A service is open, or it is shut
+</h3>
+<p>
+A lead’s laptop takes everything. We cannot say who to warn.
+Confidential lines shut the service.
+</p>
+</div>
+</div>
+<p class="dest">
+Only the tenured grow into production. The work relies on a few people,
+and there is no good path out. This is the infrastructure that gives us
+that path.
+</p>
+<aside class="notes">
+<p>Let’s ground ourselves back to reality. This is why the vision. There
+is no formal access. Debugging, research, and engineering throughput
+stop with a handful of people. A one-line error sat for days on a wrong
+out-of-memory theory, because the log waited on someone who already had
+access. We learn who cannot act in the outage, including when that
+person is asleep. Access is per person, with no expiry, and someone who
+changes team keeps what they had. Only the longest-tenured touch
+production, so only they learn it, and a 3am fix exists at 10am only as
+memory. A refund prints the seed and a person derives the key. One
+confidential swap means opening every user, or the partner gets no
+answer, because both legs exist together only in our logs. A lead’s
+laptop takes everything, with no record of what was read. There is no
+classification, so confidential lines shut a whole service. Legal
+exposure is not the same question as what an attacker could do, and logs
+never expire, so a legal hold has nothing to extend.</p>
+<p>Then the line. Only the tenured grow into production. The work relies
+on a few people, and there is no good path out. This is the
+infrastructure that gives us that path.</p>
+<p><strong>More:</strong></p>
+<p>Down is the reassurance: the fire stays, the old path stays, and
+version 1 is the small first chunk. Then what this meeting is, and what
+is not a commitment for this year.</p>
+</aside>
+</section>
+<section id="where-we-are--review"
+class="slide level2 concept review light">
+<h2 class="concept review light">Review · both halves in one breath</h2>
+<p class="kicker">
+Not for the room. 22 Oct. Remove before the pitch.
+</p>
+<ul>
+<li><strong>Heard.</strong> You said it will not be done this year or
+next year. He wants the next sentence in the same breath: it will not be
+fully done in a year or two, and that is why it is broken into steps
+that keep improving.</li>
+<li><strong>On the face now.</strong> The line under the four cards is
+his close: only the tenured grow into production, the work relies on a
+few people, there is no good path out, and this infrastructure is that
+path. Card 1 names no one. Debugging, research, and engineering
+throughput stop with a handful of people. The down “Not a commitment for
+this year” says it will not be fully done in a year or two, and that is
+why it is broken into steps, each step an improvement we keep. “End of
+the decade” is off that bullet. The quarters on the roadmap stay the
+pace. Versions 3 to 5 stay a direction, not a promise to finish them in
+2026.</li>
+</ul>
+<aside class="notes">
+<p>Review slide for the 22 Oct notes. Skip it in the room.</p>
+</aside>
+</section>
+<section id="where-we-are--the-fire" class="slide level2 concept light">
+<h2 class="concept light">The fire stays</h2>
+<p class="depth">
+A little more
+</p>
+<ul>
+<li>Nothing here disturbs the work already in front of the people who
+hold production.</li>
+<li>The old path stays up. It comes down only after the new one is the
+path people actually use.</li>
+<li>Version 1 is small, on tools the account already has. The far end is
+years out, and fuzzy.</li>
+</ul>
+<aside class="notes">
+<p>After the problems, the care list. The fire in front of the people
+who hold production is untouched. The old path stays until the new one
+is what people use. Version 1 is the small first chunk. The far end is
+not a commitment for this year.</p>
+</aside>
+</section>
+<section id="where-we-are--what-this-meeting-is"
+class="slide level2 concept light">
+<h2 class="concept light">What this meeting is</h2>
+<p class="depth mid">
+More
+</p>
+<ul>
+<li>A direction, held for a few years, taken beside the work already in
+flight.</li>
+<li>No weekend cut-over, and no build spec in this room.</li>
+<li>The far end is allowed to stay fuzzy. The first chunk is small.</li>
+<li>What we optimise for along the way: flexible, ergonomic, run by the
+teams themselves, one step at a time.</li>
+</ul>
+<aside class="notes">
+<p>This meeting sets a direction over years. It runs beside current
+work. It is not a specification and it is not a cut-over. The far end
+stays fuzzy, and the first chunk stays small.</p>
+</aside>
+</section>
+<section id="where-we-are--not-this-year"
+class="slide level2 concept light">
+<h2 class="concept light">Not a commitment for this year</h2>
+<p class="depth high">
+In detail
+</p>
+<ul>
+<li>Version 1 is short. It is the first chunk, and it uses tools the
+account already has.</li>
+<li>Version 2 is the middle. It is allowed to take a while.</li>
+<li>It will not be fully done in a year or two. That is why it is broken
+into steps, and each step is an improvement we keep.</li>
+<li>Naming them now is how the first step points the right way. It is
+not a promise to build them this year.</li>
+</ul>
+<aside class="notes">
+<p>It will not be fully done in a year or two. That is why it is broken
+into steps, and each step is an improvement we keep. Versions 3 to 5 are
+named so the first step has a direction. They are not a promise to
+finish them in 2026.</p>
+</aside>
+</section></section>
+<section>
+<section id="queue" class="title-slide slide level1 case stay-dark">
+<h1 class="case stay-dark">Today, the work waits on a few people</h1>
+<p class="kicker">
+Where we are.
+</p>
+<div class="cards band">
+<div class="card">
+<h3>
+The queue
+</h3>
+<p>
+Bug fixes, debugging, and deploys wait on the same few people.
+</p>
+</div>
+<div class="card">
+<h3>
+Found in the outage
+</h3>
+<p>
+We learn who cannot act while it is on fire. Sometimes that person is
+asleep.
+</p>
+</div>
+<div class="card">
+<h3>
+The log stayed shut
+</h3>
+<p>
+The people on the bug could not open it. It waited on someone who
+already had access.
+</p>
+</div>
+<div class="card">
+<h3>
+One line, for days
+</h3>
+<p>
+A one-line error sat for days. A wrong out-of-memory theory filled the
+wait.
+</p>
+</div>
+</div>
+<aside class="notes">
+<p>Bug fixes, debugging, and deploys wait on the same few people. We
+learn who cannot act while the outage is on, sometimes because that
+person is asleep. The people on the bug could not open the log. It
+waited on someone who already had access. A one-line error sat for days,
+and a wrong out-of-memory theory filled the wait. Who holds the access,
+and who gets to learn production, is the next slide.</p>
+<p><strong>More:</strong></p>
+<p>The one-line error is the proof you come back to on version 1. A
+non-lead should be able to read it the same week.</p>
+</aside>
+</section>
+<section id="queue--review" class="slide level2 case review stay-dark">
+<h2 class="case review stay-dark">Review · if the room hears “one
+person”</h2>
+<p class="kicker">
+Not for the room. 22 Oct. Remove before the pitch.
+</p>
+<ul>
+<li><strong>Heard.</strong> Calling out that everything relies on one
+person is fair. Someone may hear it as territory. Be ready to clarify.
+He was fine with you saying it.</li>
+<li><strong>Your words.</strong> The face is the queue, the outage, the
+shut log, and the one line that sat for days. In the 19 Oct session, at
+00:22:27, you said everything goes through a handful of people and there
+is no formalisation. Neither face names a person.</li>
+<li><strong>Suggested, if someone reacts.</strong> “The work waits on
+the access, and today that access sits with a few people. Those people
+are how production has stayed up. The missing piece is a role someone
+else can hold.”</li>
+<li>The next slide carries the line he liked, the path out. This slide
+stays the queue. The clarification lives here so you have it without
+softening the fact.</li>
+</ul>
+<aside class="notes">
+<p>Review slide for the 22 Oct notes. Skip it in the room.</p>
+</aside>
+</section>
+<section id="queue--one-incident" class="slide level2 case stay-dark">
+<h2 class="case stay-dark">The queue, in one incident</h2>
+<p class="depth">
+A little more
+</p>
+<ul>
+<li>A one-line production error sat for days.</li>
+<li>A wrong out-of-memory theory went around while it sat.</li>
+<li>Reading the log waited on someone who already had access. The people
+who could have checked it could not open it.</li>
+</ul>
+<aside class="notes">
+<p>One production error was a single line, and it sat for days. A wrong
+out-of-memory theory filled the gap. The people debugging it could not
+open the log themselves.</p>
+</aside>
+</section>
+<section id="queue--no-role" class="slide level2 case stay-dark">
+<h2 class="case stay-dark">No drill before the fire</h2>
+<p class="depth mid">
+More
+</p>
+<ul>
+<li>The gap shows up in the outage. Nothing finds it earlier.</li>
+<li>The people who could have checked the line could not open it
+themselves.</li>
+</ul>
+<aside class="notes">
+<p>The gap shows up in the outage because nothing drills it earlier. The
+people debugging the line could not open the log.</p>
+</aside>
+</section>
+<section id="queue--who-learns" class="slide level2 case stay-dark">
+<h2 class="case stay-dark">The same week</h2>
+<p class="depth high">
+In detail
+</p>
+<ul>
+<li>The one-line error is what version 1 has to unlock.</li>
+<li>A non-lead reads that log the same week, without asking the two
+people who can open anything.</li>
+</ul>
+<aside class="notes">
+<p>The one-line error is the proof for version 1. A non-lead reads that
+log the same week, without asking the two people who can open it.</p>
+</aside>
+</section></section>
+<section>
+<section id="no-role" class="title-slide slide level1 case light">
+<h1 class="case light">No role, so only the tenured learn it</h1>
+<p class="kicker">
+Where we are.
+</p>
+<div class="cards band">
+<div class="card">
+<h3>
+A name, not a role
+</h3>
+<p>
+Access is a person. No role sits behind the name.
+</p>
+</div>
+<div class="card">
+<h3>
+It never closes
+</h3>
+<p>
+A team change keeps it. Leaving does not take it away.
+</p>
+</div>
+<div class="card">
+<h3>
+Only the tenured grow
+</h3>
+<p>
+Only they touch production, so only they learn it. Everyone else falls
+further behind.
+</p>
+</div>
+<div class="card">
+<h3>
+What 10am knows
+</h3>
+<p>
+A 3am fix leaves no record. Morning has one person’s memory.
+</p>
+</div>
+</div>
+<aside class="notes">
+<p>Access is a person, not a role. A team change keeps it, and leaving
+does not take it away. Only the longest-tenured touch production, so
+only they learn it, and everyone else falls further behind. A fix at 3am
+leaves no record. At 10am the only account is that person’s memory.</p>
+</aside>
+</section>
+<section id="no-role--review" class="slide level2 case review light">
+<h2 class="case review light">Review · the line he wants as the close of
+this problem</h2>
+<p class="kicker">
+Not for the room. 22 Oct. Remove before the pitch.
+</p>
+<ul>
+<li><strong>Heard, keep.</strong> Only the tenured can grow. Everything
+relies on a few people. There is no good path out. This infrastructure
+is the way out.</li>
+<li><strong>Your words.</strong> The face is a name with no role, access
+that never closes, only the tenured learning it, and a 3am fix that
+morning cannot see. It stops before “this is the way out.” The way out
+is the line under the four cards on “Where we are,” and again in the
+versions.</li>
+<li><strong>Suggested close, then stop.</strong> “Only the tenured grow
+into production. The work relies on a few people, and there is no good
+path out. This is the infrastructure that gives us that path.”</li>
+<li>The queue slide holds the clarification if someone hears territory.
+This slide holds the turn from the problem to the proposal.</li>
+</ul>
+<aside class="notes">
+<p>Review slide for the 22 Oct notes. Skip it in the room.</p>
+</aside>
+</section></section>
+<section>
+<section id="open-data" class="title-slide slide level1 case stay-dark">
+<h1 class="case stay-dark">Today, sensitive data is already in the
+open</h1>
+<p class="kicker">
+Where we are.
+</p>
+<div class="cards band">
+<div class="card">
+<h3>
+A confidential swap
+</h3>
+<p>
+Open the service and see every user, or the partner gets no answer. Both
+legs exist together only in our logs.
+</p>
+</div>
+<div class="card">
+<h3>
+A stuck deposit
+</h3>
+<p>
+The pull request prints the seed. A person derives the key by hand.
+</p>
+</div>
+<div class="card">
+<h3>
+A lead laptop
+</h3>
+<p>
+The attacker needs no second break-in. The whole project, no limit, no
+record.
+</p>
+</div>
+<div class="card">
+<h3>
+No view of the data
+</h3>
+<p>
+We see services. “Confidential” is the only label. Nothing says how
+sensitive a piece of data is.
+</p>
+</div>
+</div>
+<aside class="notes">
+<p>A partner’s confidential swap fails. To explain why, someone opens
+the service and can see every user’s data. The alternative is that the
+partner gets no answer. A stuck deposit is refunded by a pull request
+that prints the seed, and a person derives the private key by hand. A
+lead’s laptop is hacked and the attacker has the whole project, with no
+limit and no record. We have no view of the data flowing through
+Intents. We see services.</p>
+<p><strong>More:</strong></p>
+<p>The laptop is the public claim. An internal incident becomes “Intents
+is not confidential” because we cannot say what was taken or who to
+warn. Do not mention agents. That line is the last slide.</p>
+</aside>
+</section>
+<section id="open-data--review"
+class="slide level2 case review stay-dark">
+<h2 class="case review stay-dark">Review · the line he asked to
+rethink</h2>
+<p class="kicker">
+Not for the room. 22 Oct. Remove before the pitch.
+</p>
+<ul>
+<li><strong>Heard.</strong> “It’s a lie that it’s confidential” is too
+strong. It holds in a strict technical sense. In the room it is also a
+business and a legal word, and the business objectives are still to be
+aligned. He wrote a replacement: the capability to raise confidentiality
+as far as the business wants, a level up when that decision is
+made.</li>
+<li><strong>Your words.</strong> That sentence is not in the 19 Oct
+transcript. The closest line on this slide is the speaker note: an
+incident becomes a public claim that Intents is not confidential,
+because we cannot say what was taken or who to warn. The cards
+themselves state procedures: every user, the seed, the laptop, no
+classification.</li>
+<li><strong>Suggested.</strong> The four cards stay. They are
+procedures. The spoken line “it is a lie” comes off. If the vision needs
+the positive half, it is said on “Wouldn’t it be nice,” beside the
+competition line: “We can raise how confidential a read is, as far as
+the business wants, and move up a level when that decision is
+made.”</li>
+<li>The stuck-deposit card is the refund he also marked. Add the clause
+in the spoken line: there is no other mechanism today. The case-study
+slide says the same sentence before its diagram.</li>
+</ul>
+<aside class="notes">
+<p>Review slide for the 22 Oct notes. Skip it in the room.</p>
+</aside>
+</section>
+<section id="open-data--two-jobs" class="slide level2 case stay-dark">
+<h2 class="case stay-dark">Two jobs that expose too much</h2>
+<p class="depth">
+A little more
+</p>
+<ul>
+<li>A failed confidential swap. The trace the partner needs is in a
+service that also holds every other user. There is no way to open one
+without the other.</li>
+<li>A stuck deposit. The refund logs the seed, a person reads it, and a
+person derives the key. A person holding a key is the weakest mechanism
+we have.</li>
+<li>Both are ordinary work. They are not break-ins. The exposure is the
+procedure.</li>
+</ul>
+<aside class="notes">
+<p>A failed confidential swap cannot be explained without opening every
+user’s data. A stuck deposit is refunded by printing the seed and
+deriving the key by hand. Both are ordinary procedures, and both expose
+too much.</p>
+</aside>
+</section>
+<section id="open-data--laptop" class="slide level2 case stay-dark">
+<h2 class="case stay-dark">The laptop is a public claim</h2>
+<p class="depth mid">
+More
+</p>
+<ul>
+<li>A lead’s laptop is compromised. The attacker has what the lead has:
+the project, with no limit on what is read and no record of what was
+read.</li>
+<li>Afterwards we cannot say what was taken. We cannot say which users
+to warn.</li>
+<li>That is the path from an internal incident to a public claim that
+Intents is not confidential. The product’s promise and the laptop are
+the same story.</li>
+</ul>
+<aside class="notes">
+<p>A compromised lead laptop takes the whole project, with no record of
+what was read. We cannot name what was taken or who to warn. That is how
+an internal incident becomes a public claim that Intents is not
+confidential.</p>
+</aside>
+</section>
+<section id="open-data--cannot-see" class="slide level2 case stay-dark">
+<h2 class="case stay-dark">What we cannot see</h2>
+<p class="depth high">
+In detail
+</p>
+<ul>
+<li>There is no classification. “Confidential” is the only label. Legal
+exposure and what an attacker could do with the data are not separated.
+Fields that identify a person only when combined are unmarked.</li>
+<li>Logs are never deleted, because nothing says when they may die. Cost
+grows. A legal hold has nothing to attach to, because nothing carries an
+expiry to extend.</li>
+<li>We see services, not data. We cannot say what moved through Intents,
+or how sensitive a given piece is. Later controls have nothing to bind
+to.</li>
+</ul>
+<aside class="notes">
+<p>Sensitivity is undefined, so legal exposure and attacker capability
+are the same label, and logs never expire. We see services rather than
+data.</p>
+</aside>
+</section></section>
+<section id="service-shut" class="title-slide slide level1 case light">
+<h1 class="case light">A service is open, or it is shut</h1>
+<p class="kicker">
+Where we are.
+</p>
+<div class="cards band">
+<div class="card">
+<h3>
+A lead laptop
+</h3>
+<p>
+The attacker has the whole project, with no limit on what is read and no
+record of what was read.
+</p>
+</div>
+<div class="card">
+<h3>
+The public claim
+</h3>
+<p>
+Afterwards we cannot say what was taken, or which users to warn. That is
+how an internal incident becomes a claim that Intents is not
+confidential.
+</p>
+</div>
+<div class="card">
+<h3>
+No classification
+</h3>
+<p>
+Legal exposure and what an attacker could do with the data are not
+separated. Confidential lines shut a whole service, so the ordinary
+lines stay unread.
+</p>
+</div>
+<div class="card">
+<h3>
+Logs never expire
+</h3>
+<p>
+Nothing says when a log may die. The bill grows, and a legal hold has
+nothing to extend.
+</p>
+</div>
+</div>
+<aside class="notes">
+<p>A lead’s laptop is compromised. The attacker has the whole project,
+with no limit and no record. Afterwards we cannot say what was taken or
+which users to warn, and that is the path from an internal incident to a
+public claim that Intents is not confidential. There is no
+classification. Legal exposure and what an attacker could do are not the
+same question. If part of a service’s logs are confidential, the person
+who could read the rest gets nothing. Logs are never deleted, because
+nothing says when they may die, so a legal hold has nothing to extend.
+We see which service ran. We do not see what data moved through
+Intents.</p>
+</aside>
+</section>
+
+<section>
+<section id="roadmap" class="title-slide slide level1 concept light">
+<h1 class="concept light">Five versions</h1>
+<p class="kicker">
+One quarter each. We are in Q4 2026.
+</p>
+<div class="road full" data-at="0">
+<div class="track">
+
+</div>
+<div class="node">
+<div class="dot">
+<i class="ico ico-role"></i>
+</div>
+<p class="when">
+Q4 2026
+</p>
+<h3>
+v1 · Hybrid
+</h3>
+<p class="blurb">
+Simple roles on a tiered service. Sensitivity waits. A known compromise.
+</p>
+</div>
+<div class="node">
+<div class="dot">
+<i class="ico ico-line"></i>
+</div>
+<p class="when">
+Q1 2027
+</p>
+<h3>
+v2 · The line
+</h3>
+<p class="blurb">
+The label moves onto the line. One service at a time.
+</p>
+</div>
+<div class="node">
+<div class="dot">
+<i class="ico ico-window"></i>
+</div>
+<p class="when">
+Q2 2027
+</p>
+<h3>
+v3 · A window
+</h3>
+<p class="blurb">
+Sensitive access is opened, then it expires.
+</p>
+</div>
+<div class="node">
+<div class="dot">
+<i class="ico ico-door"></i>
+</div>
+<p class="when">
+Q3 2027
+</p>
+<h3>
+v4 · Gateway
+</h3>
+<p class="blurb">
+A gateway in front. Direct access stays while it is tested.
+</p>
+</div>
+<div class="node">
+<div class="dot">
+<i class="ico ico-only"></i>
+</div>
+<p class="when">
+Q4 2027
+</p>
+<h3>
+v5 · No backdoor
+</h3>
+<p class="blurb">
+After the testing, direct access comes out.
+</p>
+</div>
+</div>
+<ul class="road-why">
+<li>
+Incremental, and backwards compatible. Current processes keep running.
+Nobody is blocked.
+</li>
+<li>
+The optimal way to the far vision. One organisation-wide change would be
+too fast.
+</li>
+<li>
+Each version is usable on its own. The next one builds on it.
+</li>
+<li>
+Version 1 is this quarter. Version 5 is Q4 2027. Version 3 can start in
+its quarter while version 2 is still moving services.
+</li>
+</ul>
+<aside class="notes">
+<p>Five versions, one quarter each. We are in Q4 2026, so version 1 is
+this quarter and version 5 is Q4 2027. These quarters are the pace.
+Versions 3, 4, and 5 are not a commitment inside this year. Version 3’s
+quarter can overlap version 2, because the window needs version 1’s
+roles and does not need the label on the line. Say that when you point
+at Q2. The point of five versions is that the far vision arrives
+incrementally. It is backwards compatible. Current processes keep
+running, and nobody is blocked. A single organisation-wide change would
+be too fast. Each version is usable on its own, and the next one builds
+on it. The next slides open one version at a time.</p>
+<p><strong>More:</strong></p>
+<p>Point along the line as you name the quarter. Do not open the
+compromise, the key, or the refund here. Each has its own slide.</p>
+</aside>
+</section>
+<section id="roadmap--review" class="slide level2 concept light review">
+<h2 class="concept light review">Review · bastion on the line, and both
+halves of the pace</h2>
+<p class="kicker">
+Not for the room. 22 Oct. Remove before the pitch.
+</p>
+<ul>
+<li><strong>Heard.</strong> The word is bastion server, the established
+term. Break-glass is the recorded exception. The direct path is measured
+until its use reaches zero and people are comfortable. That path can go
+through break-glass first.</li>
+<li><strong>Your words.</strong> The version 4 node says “Gateway.” In
+the 19 Oct session you and he both used gateway and bastion. By 01:09:50
+the agreed word for the parallel path was bastion, and the switch-off
+happens after it has been used for a long stretch.</li>
+<li><strong>Suggested.</strong> The node reads “v4 · Bastion.” The
+blurb: “A bastion in front. Direct access stays while it is tested.” Say
+the pace pair in one breath, the same pair as on “Where we are”: it will
+not be fully done in a year or two, and that is why it is these five
+steps.</li>
+<li>Version 4’s own slide holds the break-glass and the measurement.
+This slide only renames the node.</li>
+</ul>
+<aside class="notes">
+<p>Review slide for the 22 Oct notes. Skip it in the room.</p>
+</aside>
+</section></section>
+<section>
+<section id="v1"
+class="title-slide slide level1 concept rail stay-dark">
+<h1 class="concept rail stay-dark">The service is the tier</h1>
+<p class="kicker">
+Short. A hybrid, taken on purpose.
+</p>
+<div class="road rail" data-at="1">
+<div class="track">
+
+</div>
+<div class="node now">
+<div class="dot">
+<i class="ico ico-role"></i>
+</div>
+<p class="when">
+Short
+</p>
+<h3>
+v1 · Hybrid
+</h3>
+</div>
+<div class="node ahead mid">
+<div class="dot">
+<i class="ico ico-line"></i>
+</div>
+<p class="when">
+Middle
+</p>
+<h3>
+v2 · The line
+</h3>
+</div>
+<div class="node ahead long">
+<div class="dot">
+<i class="ico ico-window"></i>
+</div>
+<p class="when">
+Long
+</p>
+<h3>
+v3 · A window
+</h3>
+</div>
+<div class="node ahead long">
+<div class="dot">
+<i class="ico ico-door"></i>
+</div>
+<p class="when">
+Long
+</p>
+<h3>
+v4 · Gateway
+</h3>
+</div>
+<div class="node ahead long">
+<div class="dot">
+<i class="ico ico-only"></i>
+</div>
+<p class="when">
+Long
+</p>
+<h3>
+v5 · No backdoor
+</h3>
+</div>
+</div>
+<div class="road-stack">
+<div class="card road-objective">
+<h3>
+Objective
+</h3>
+<p>
+Simple roles, on one tier per service. Data sensitivity waits. A known
+compromise, taken on purpose.
+</p>
+</div>
+<ul>
+<li>
+Quick to ship.
+</li>
+<li>
+A foundation people can opt into straight away.
+</li>
+<li>
+A noticeable effect on engineering, straight away.
+</li>
+<li>
+The base later versions build on.
+</li>
+<li>
+Sensitivity on the tier. Roles are a simple acyclic graph.
+</li>
+<li>
+Teams scale independently.
+</li>
+<li>
+Incremental. Nobody is blocked, and current processes keep running.
+</li>
+</ul>
+</div>
+<aside class="notes">
+<p>Version 1 is quick to ship, and people can opt into it straight away.
+Engineering feels the effect straight away, and later versions build on
+the same foundation. Sensitivity sits on the tier, roles are a simple
+acyclic graph, and teams scale on their own. It is incremental. Current
+work is not stopped.</p>
+<p><strong>More:</strong></p>
+<p>Down is the case: Vlad on Monday, the whole-service compromise, and
+why this is the third path.</p>
+</aside>
+</section>
+<section id="v1--case" class="slide level2 concept">
+<h2 class="concept">In one case</h2>
+<p class="depth">
+A little more
+</p>
+<ul>
+<li>A basic role model, applied to each service. The service gets one
+tier. People use it while the fuller design is still ahead.</li>
+<li>Vlad joins the bridge team on Monday. His lead adds him to bridge
+engineer. He reads tier 2 and tier 3 that day. He does not ask Anton.
+Tier 0 and tier 1 stay closed until a grant expires.</li>
+<li>The known compromise: a service is labelled as a whole. Eighty
+percent ordinary and twenty percent confidential means the ordinary part
+stays closed, or the confidential part leaks. poa-bridge-manager is the
+case. One line logs a key-lifecycle event, and the rest is
+ordinary.</li>
+<li>Version 2 is where sensitivity is defined, and the label moves onto
+the line. The roles survive that move.</li>
+<li>Two other ways of starting were set down. Labelling every line in
+all thirty services first blocks the first engineer. Doing that fully in
+one service leaves everyone else where they are. This hybrid is the
+third path.</li>
+</ul>
+<aside class="notes">
+<p>Vlad joins the bridge team on Monday, his lead adds him once, and he
+reads tier 2 and tier 3 the same day. poa-bridge-manager is the known
+compromise: one key-lifecycle line, and the rest ordinary, labelled as a
+whole. Labelling every line first, or doing it fully in one service,
+were set down. This hybrid is the third path.</p>
+</aside>
+</section></section>
+<section>
+<section id="v2"
+class="title-slide slide level1 concept rail stay-dark">
+<h1 class="concept rail stay-dark">One service at a time</h1>
+<p class="kicker">
+Middle. Research, in parallel.
+</p>
+<div class="road rail" data-at="2">
+<div class="track">
+
+</div>
+<div class="node done">
+<div class="dot">
+<i class="ico ico-role"></i>
+</div>
+<p class="when">
+Short
+</p>
+<h3>
+v1 · Hybrid
+</h3>
+</div>
+<div class="node now mid">
+<div class="dot">
+<i class="ico ico-line"></i>
+</div>
+<p class="when">
+Middle
+</p>
+<h3>
+v2 · The line
+</h3>
+</div>
+<div class="node ahead long">
+<div class="dot">
+<i class="ico ico-window"></i>
+</div>
+<p class="when">
+Long
+</p>
+<h3>
+v3 · A window
+</h3>
+</div>
+<div class="node ahead long">
+<div class="dot">
+<i class="ico ico-door"></i>
+</div>
+<p class="when">
+Long
+</p>
+<h3>
+v4 · Gateway
+</h3>
+</div>
+<div class="node ahead long">
+<div class="dot">
+<i class="ico ico-only"></i>
+</div>
+<p class="when">
+Long
+</p>
+<h3>
+v5 · No backdoor
+</h3>
+</div>
+</div>
+<div class="road-stack">
+<div class="card road-objective">
+<h3>
+Objective
+</h3>
+<p>
+Research the roles and the sensitivity, and prove both on one service,
+while current operations keep running.
+</p>
+</div>
+<ul>
+<li>
+In parallel. Current operational procedures keep running.
+</li>
+<li>
+The research phase for roles: how they are defined, and how the graph is
+drawn.
+</li>
+<li>
+The research phase for sensitivity: what it means per service, and how
+it is implemented and rolled out.
+</li>
+<li>
+One service, in isolation, is the use case.
+</li>
+<li>
+That is the point of the approach. The proof runs beside production, and
+the rest of the company keeps working.
+</li>
+<li>
+The foundation for seeing the data flow through all of Intents.
+</li>
+<li>
+On that view: acts, metrics, access policies, and an action started
+safely.
+</li>
+</ul>
+</div>
+<aside class="notes">
+<p>Version 2 runs in parallel, and current operational procedures keep
+running. It is the research phase for roles, how they are defined and
+graphed, and for what data sensitivity means per service and how it is
+rolled out. One service, in isolation, is the use case. The rest of the
+company keeps working while that proof runs. The result is a view of the
+data flowing through Intents. On that view we can build acts, metrics,
+access policies, and an action started safely.</p>
+<p><strong>More:</strong></p>
+<p>Down is the case: the label on the line, poa-bridge-manager, and the
+record naming fields.</p>
+</aside>
+</section>
+<section id="v2--case" class="slide level2 concept">
+<h2 class="concept">On one service</h2>
+<p class="depth">
+A little more
+</p>
+<ul>
+<li>The label moves from the whole service onto the line. It lands one
+service at a time. A service that is fine with the version 1 label stays
+there.</li>
+<li>poa-bridge-manager is the case. One line logs a key-lifecycle event,
+and the rest is ordinary. Once it has moved, the ordinary lines can be
+read and the sensitive fields are absent.</li>
+<li>A line that has not been labelled keeps the service’s version 1
+label. Done, for this version, is that service.</li>
+<li>From here the record can name which fields sat above the role. It
+does not keep the rows.</li>
+<li>This is where the company starts following the data through Intents.
+Legal exposure and financial exposure are two kinds. They are not a
+fifth level.</li>
+</ul>
+<aside class="notes">
+<p>The label moves onto the line one service at a time, and a service
+that is fine with version 1 stays there. poa-bridge-manager is the case:
+once it has moved, ordinary lines can be read and the sensitive fields
+are absent. The record names which fields sat above the role, and it
+does not keep the rows. Legal exposure and financial exposure are two
+kinds.</p>
+</aside>
+</section></section>
+<section>
+<section id="v3"
+class="title-slide slide level1 concept rail stay-dark">
+<h1 class="concept rail stay-dark">The foundation is in</h1>
+<p class="kicker">
+Long. Security hardening can start.
+</p>
+<div class="road rail" data-at="3">
+<div class="track">
+
+</div>
+<div class="node done">
+<div class="dot">
+<i class="ico ico-role"></i>
+</div>
+<p class="when">
+Short
+</p>
+<h3>
+v1 · Hybrid
+</h3>
+</div>
+<div class="node done mid">
+<div class="dot">
+<i class="ico ico-line"></i>
+</div>
+<p class="when">
+Middle
+</p>
+<h3>
+v2 · The line
+</h3>
+</div>
+<div class="node now long">
+<div class="dot">
+<i class="ico ico-window"></i>
+</div>
+<p class="when">
+Long
+</p>
+<h3>
+v3 · A window
+</h3>
+</div>
+<div class="node ahead long">
+<div class="dot">
+<i class="ico ico-door"></i>
+</div>
+<p class="when">
+Long
+</p>
+<h3>
+v4 · Gateway
+</h3>
+</div>
+<div class="node ahead long">
+<div class="dot">
+<i class="ico ico-only"></i>
+</div>
+<p class="when">
+Long
+</p>
+<h3>
+v5 · No backdoor
+</h3>
+</div>
+</div>
+<div class="road-stack">
+<div class="card road-objective">
+<h3>
+Objective
+</h3>
+<p>
+Sensitivity can be named in any service, and a role says how that data
+is managed. Hardening starts on that foundation.
+</p>
+</div>
+<ul>
+<li>
+Define sensitivity in any service. A role framework applies the rules
+for how that data is managed.
+</li>
+<li>
+Those two are the foundation. Iteration on them is a robust
+organisational framework for Intents.
+</li>
+<li>
+First hardening: audit the sessions. If Anton’s laptop is compromised
+and he says he was not the one acting, the session is visible. Threat
+detection as it happens.
+</li>
+<li>
+For the people at the top, a hardware key is one suggestion. Defence in
+depth: a compromised computer is limited in what it can do.
+</li>
+<li>
+Said with the cut. The key has no screen. A touch does not prove the
+prompt was the one that was signed.
+</li>
+<li>
+The long-term work starts here. This step opens the next ones.
+</li>
+</ul>
+</div>
+<aside class="notes">
+<p>The foundation is in place. Sensitivity can be named in any service,
+and roles say how that data is managed. Iteration on those two is the
+organisational framework for Intents. The first hardening is an audit of
+sessions, so a compromised laptop is visible when the person says they
+were not the one acting. A hardware key for the people at the top is one
+suggestion for defence in depth, and it is said with the cut: the key
+has no screen. This is where the long-term work starts.</p>
+<p><strong>More:</strong></p>
+<p>Down is the cut on the key. A touch can sign a different payload from
+the one on the screen, and the false sense of security is the dangerous
+part.</p>
+</aside>
+</section>
+<section id="v3--review" class="slide level2 concept review">
+<h2 class="concept review">Review · secure by design, and defence in
+depth</h2>
+<p class="kicker">
+Not for the room. 22 Oct. Remove before the pitch.
+</p>
+<ul>
+<li><strong>Heard.</strong> Put “secure by design” together with
+“defence in depth.” He called it one more quality on a dimension Axel
+already cares about.</li>
+<li><strong>Your words.</strong> This face already says defence in
+depth, and it ties that phrase to the hardware key. In the 19 Oct
+session, at 00:34:33, you used defence in depth for the same key. The
+cut is the next down. “Secure by design” is not on the slide.</li>
+<li><strong>Suggested spoken pair.</strong> “Secure by design, and
+defence in depth.” The key is one layer inside that pair, and it is
+still said with the cut: a touch proves a person was there, and a key
+with no screen does not prove what they approved.</li>
+<li>The rail on this slide labels version 4 “Gateway.” That word changes
+with the bastion note on the version 4 slide.</li>
+</ul>
+<aside class="notes">
+<p>Review slide for the 22 Oct notes. Skip it in the room.</p>
+</aside>
+</section>
+<section id="v3--cut" class="slide level2 concept">
+<h2 class="concept">The cut on the key</h2>
+<p class="depth">
+A little more
+</p>
+<ul>
+<li>A hardware key is better to have. It is a stepping stone. It is not
+the finish line. People hear the key and stop, as if the company is
+already protected.</li>
+<li>The structural gap: a standard key has no display of what is being
+approved. A touch proves a person was there. It does not prove what they
+approved.</li>
+<li>On a compromised laptop, the program that talks to the key can be
+swapped. The screen shows the expected request. The key signs another
+payload. A second touch can be prompted as if the first failed. People
+touch again, and the screen still looks fine.</li>
+<li>The false sense of security is the dangerous part. People drop their
+guard because they touched the key.</li>
+<li>Still open: a second device that shows the exact action and approves
+it. A second person who can see the flow and pause it. Rate limits sit
+with that person.</li>
+</ul>
+<aside class="notes">
+<p>A hardware key is better to have, and it is a stepping stone, not the
+finish line. A standard key has no screen, so a touch proves a person
+was there and does not prove what they approved. On a compromised laptop
+the program that talks to the key can swap the payload and prompt a
+second touch as if the first failed. The dangerous part is the false
+sense of security, because people drop their guard after the touch.</p>
+</aside>
+</section></section>
+<section>
+<section id="v4"
+class="title-slide slide level1 concept rail stay-dark">
+<h1 class="concept rail stay-dark">A gateway, in parallel</h1>
+<p class="kicker">
+Long. Control, with the work intact.
+</p>
+<div class="road rail" data-at="4">
+<div class="track">
+
+</div>
+<div class="node done">
+<div class="dot">
+<i class="ico ico-role"></i>
+</div>
+<p class="when">
+Short
+</p>
+<h3>
+v1 · Hybrid
+</h3>
+</div>
+<div class="node done mid">
+<div class="dot">
+<i class="ico ico-line"></i>
+</div>
+<p class="when">
+Middle
+</p>
+<h3>
+v2 · The line
+</h3>
+</div>
+<div class="node done long">
+<div class="dot">
+<i class="ico ico-window"></i>
+</div>
+<p class="when">
+Long
+</p>
+<h3>
+v3 · A window
+</h3>
+</div>
+<div class="node now long">
+<div class="dot">
+<i class="ico ico-door"></i>
+</div>
+<p class="when">
+Long
+</p>
+<h3>
+v4 · Gateway
+</h3>
+</div>
+<div class="node ahead long">
+<div class="dot">
+<i class="ico ico-only"></i>
+</div>
+<p class="when">
+Long
+</p>
+<h3>
+v5 · No backdoor
+</h3>
+</div>
+</div>
+<div class="road-stack">
+<div class="card road-objective">
+<h3>
+Objective
+</h3>
+<p>
+A gateway between people and production data. It adds control, and the
+ability to operate stays.
+</p>
+</div>
+<ul>
+<li>
+No one person has direct access to production data. Interaction goes
+through the gateway.
+</li>
+<li>
+The result is operational risk management and control.
+</li>
+<li>
+Capabilities stay. A person can still interact, issue a command, operate
+on the data, and query it.
+</li>
+<li>
+Security hardening that solves the risk, without compromising the rest.
+</li>
+<li>
+In parallel. A backdoor keeps direct access available while the gateway
+is tested.
+</li>
+</ul>
+</div>
+<aside class="notes">
+<p>Version 4 introduces a gateway. No one person has direct access to
+production data, and interaction goes through it. That adds operational
+risk management and control. People can still interact, issue a command,
+operate on the data, and query it. It is security hardening that solves
+the risk without compromising the rest. It runs in parallel. A backdoor
+keeps direct access available while the gateway is tested.</p>
+<p><strong>More:</strong></p>
+<p>Down is how a session is recorded, why the backdoor is temporary, and
+that the product is not chosen on this slide.</p>
+</aside>
+</section>
+<section id="v4--review" class="slide level2 concept review">
+<h2 class="concept review">Review · say bastion</h2>
+<p class="kicker">
+Not for the room. 22 Oct. Remove before the pitch.
+</p>
+<ul>
+<li><strong>Heard.</strong> No “gateway.” The term is bastion host, or
+bastion server. Break-glass is the mechanism. The path is to measure how
+often the direct path is used until it reaches zero and people are
+comfortable. The direct path can go through break-glass first.</li>
+<li><strong>Your words.</strong> The title is “A gateway, in parallel.”
+The next down says gateway throughout. The diagram on the refund case
+already labels the box “gateway (bastion).” In the 19 Oct session, at
+01:06:17, you said gateway or bastion, and at 01:09:50 he locked the
+word parallel: people use the bastion, and when it fails they use the
+path they have, until the bastion has been the way for a long
+stretch.</li>
+<li><strong>Suggested title.</strong> “A bastion, in parallel.” Spoken:
+“Commands go through a bastion server. The session is recorded. The
+direct path stays up beside it. We measure how often that path is used.
+It can run as break-glass first: a reason, a second person told, a hard
+stop. It comes down when that count has been at zero long enough that
+people are comfortable.”</li>
+<li>Which product, bought or built, stays undecided. The roles stay the
+same roles.</li>
+</ul>
+<aside class="notes">
+<p>Review slide for the 22 Oct notes. Skip it in the room.</p>
+</aside>
+</section>
+<section id="v4--beside" class="slide level2 concept">
+<h2 class="concept">Beside the backdoor</h2>
+<p class="depth">
+A little more
+</p>
+<ul>
+<li>A session through the gateway is recorded. What was typed is
+separate from what came back. A reviewer sees the commands, and asks for
+the output only when the commands warrant it.</li>
+<li>A session on the backdoor is not recorded. That is why the backdoor
+is for the test, and not the steady state.</li>
+<li>People use the gateway. When it fails, they use the path they
+already have. A fire is not blocked while the gateway is still being
+proven.</li>
+<li>Which product the gateway is, bought or built, is not decided here.
+The roles are the same roles.</li>
+</ul>
+<aside class="notes">
+<p>A session through the gateway is recorded, with what was typed kept
+separate from what came back. A session on the backdoor is not recorded,
+which is why that path is temporary. When the gateway fails, people use
+the path they already have, so a fire is not blocked while it is still
+being proven. Which product the gateway is, bought or built, is not
+decided here.</p>
+</aside>
+</section></section>
+<section>
+<section id="v5"
+class="title-slide slide level1 concept rail stay-dark">
+<h1 class="concept rail stay-dark">The backdoor comes out</h1>
+<p class="kicker">
+Long. After the testing.
+</p>
+<div class="road rail" data-at="5">
+<div class="track">
+
+</div>
+<div class="node done">
+<div class="dot">
+<i class="ico ico-role"></i>
+</div>
+<p class="when">
+Short
+</p>
+<h3>
+v1 · Hybrid
+</h3>
+</div>
+<div class="node done mid">
+<div class="dot">
+<i class="ico ico-line"></i>
+</div>
+<p class="when">
+Middle
+</p>
+<h3>
+v2 · The line
+</h3>
+</div>
+<div class="node done long">
+<div class="dot">
+<i class="ico ico-window"></i>
+</div>
+<p class="when">
+Long
+</p>
+<h3>
+v3 · A window
+</h3>
+</div>
+<div class="node done long">
+<div class="dot">
+<i class="ico ico-door"></i>
+</div>
+<p class="when">
+Long
+</p>
+<h3>
+v4 · Gateway
+</h3>
+</div>
+<div class="node now long">
+<div class="dot">
+<i class="ico ico-only"></i>
+</div>
+<p class="when">
+Long
+</p>
+<h3>
+v5 · No backdoor
+</h3>
+</div>
+</div>
+<div class="road-stack">
+<div class="card road-objective">
+<h3>
+Objective
+</h3>
+<p>
+After the gateway has been tested, and tested again, every backdoor
+comes out.
+</p>
+</div>
+<ul>
+<li>
+The gateway stays beside the old path until that testing is done.
+</li>
+<li>
+Then direct access comes out. There is no backdoor.
+</li>
+</ul>
+</div>
+<aside class="notes">
+<p>Version 5 is the end of the test. The gateway has been tested, and
+tested again, until it is the way the work happens. Then every backdoor
+comes out, and direct access is gone.</p>
+<p><strong>More:</strong></p>
+<p>Down is what the record then covers, and the two uses that stay after
+this version.</p>
+</aside>
+</section>
+<section id="v5--review" class="slide level2 concept review">
+<h2 class="concept review">Review · the count reaches zero</h2>
+<p class="kicker">
+Not for the room. 22 Oct. Remove before the pitch.
+</p>
+<ul>
+<li><strong>Heard.</strong> Measure how often the direct path is used
+until it reaches zero and people are comfortable. That path can be
+break-glass first. Then it comes out.</li>
+<li><strong>Your words.</strong> The face says the gateway is tested
+until it is the way the work happens, then every backdoor comes out. The
+measurement, and break-glass as the last form of the direct path, are
+not on the face. The 19 Oct agreement at 01:09:50 was the same
+measurement: used for a long stretch, then the other way switches
+off.</li>
+<li><strong>Suggested spoken close.</strong> “We measure how often the
+direct path is used. It can run as break-glass first. It comes out when
+that count has been zero long enough that people are comfortable.” Say
+bastion, in the same breath as version 4.</li>
+<li>The refund that never shows the seed, and the one-hour trace, stay
+off this slide and off the matrix. They come after.</li>
+</ul>
+<aside class="notes">
+<p>Review slide for the 22 Oct notes. Skip it in the room.</p>
+</aside>
+</section>
+<section id="v5--after" class="slide level2 concept">
+<h2 class="concept">After the backdoor</h2>
+<p class="depth">
+A little more
+</p>
+<ul>
+<li>Every privileged command is on the record, because there is nowhere
+else to run it.</li>
+<li>A refund that never shows the seed, and one confidential trace for
+one hour, come after this version. They are not part of it.</li>
+<li>The cost is a runtime the company owns. Its availability is
+production’s.</li>
+</ul>
+<aside class="notes">
+<p>Every privileged command is on the record, because there is nowhere
+else to run it. A refund that never shows the seed, and one confidential
+trace for one hour, come after this version and are not part of it. The
+cost is a runtime the company owns, and its availability is
+production’s.</p>
+</aside>
+</section></section>
+<section>
+<section id="matrix" class="title-slide slide level1 closing stay-dark">
+<h1 class="closing stay-dark">What becomes true</h1>
+<p class="kicker">
+A tick is yes, and it stays yes. A cross is no. v1 is short, v2 is
+middle, and v3 to v5 are long.
+</p>
+<table class="matrix">
+<thead>
+<tr>
+<th>
+</th>
+<th>
+Today
+</th>
+<th>
+v1
+</th>
+<th>
+v2
+</th>
+<th>
+v3
+</th>
+<th>
+v4
+</th>
+<th>
+v5
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+An engineer opens ordinary logs the day they join, without asking
+</td>
+<td class="no">
+<span class="no">✗</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+</tr>
+<tr>
+<td>
+Their lead grants that by adding them to one role
+</td>
+<td class="no">
+<span class="no">✗</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+</tr>
+<tr>
+<td>
+Three people in the domain can approve a sensitive read
+</td>
+<td class="no">
+<span class="no">✗</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+</tr>
+<tr>
+<td>
+A service with no tier cannot ship
+</td>
+<td class="no">
+<span class="no">✗</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+</tr>
+<tr>
+<td>
+On a service that has moved, sensitive fields stay absent
+</td>
+<td class="no">
+<span class="no">✗</span>
+</td>
+<td class="no">
+<span class="no">✗</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+</tr>
+<tr>
+<td>
+A log line on that service has an expiry a hold can extend
+</td>
+<td class="no">
+<span class="no">✗</span>
+</td>
+<td class="no">
+<span class="no">✗</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+</tr>
+<tr>
+<td>
+We can name the fields a read touched, and we do not keep the rows
+</td>
+<td class="no">
+<span class="no">✗</span>
+</td>
+<td class="no">
+<span class="no">✗</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+</tr>
+<tr>
+<td>
+Sensitive access stays closed until a window opens
+</td>
+<td class="no">
+<span class="no">✗</span>
+</td>
+<td class="no">
+<span class="no">✗</span>
+</td>
+<td class="no">
+<span class="no">✗</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+</tr>
+<tr>
+<td>
+A gateway command is on the record, typed apart from the output
+</td>
+<td class="no">
+<span class="no">✗</span>
+</td>
+<td class="no">
+<span class="no">✗</span>
+</td>
+<td class="no">
+<span class="no">✗</span>
+</td>
+<td class="no">
+<span class="no">✗</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+</tr>
+<tr>
+<td>
+No direct path remains
+</td>
+<td class="no">
+<span class="no">✗</span>
+</td>
+<td class="no">
+<span class="no">✗</span>
+</td>
+<td class="no">
+<span class="no">✗</span>
+</td>
+<td class="no">
+<span class="no">✗</span>
+</td>
+<td class="no">
+<span class="no">✗</span>
+</td>
+<td class="yes">
+<span class="ok">✓</span>
+</td>
+</tr>
+</tbody>
+</table>
+<aside class="notes">
+<p>Two ways of starting were set down, because each one blocks the first
+benefit. Labelling every log line, in all thirty services, before anyone
+new can read anything, waits on a shared logger and on every sensitivity
+kind. The first engineer stays blocked until that work is finished.
+Doing that fully in one service makes that service correct, and the
+company does not feel the change.</p>
+<p>Version 1 is the third path. Vlad joins the bridge team on Monday.
+His lead adds him to one role, bridge engineer. That role may read tier
+2 and tier 3. He opens the ordinary logs the same day. He does not ask
+Anton. Point at the first two rows. The third row is the same Monday:
+three people in his domain can approve a sensitive read. Today that pool
+is two. The fourth row is the gate. A service with no tier cannot
+ship.</p>
+<p>poa-bridge-manager is the compromise, said out loud. One line logs a
+key-lifecycle event, and the rest is ordinary. In version 1 the service
+is labelled as a whole, so the ordinary part stays closed, or that line
+leaks. The fifth row stays a cross until version 2, because the question
+is a service that has moved. Once this service has moved, Vlad reads the
+ordinary lines and the sensitive fields are absent. A service that is
+fine with the version 1 label stays there. Done, for version 2, is that
+service. The sixth row ticks with it. A line on that service has an
+expiry a hold can extend.</p>
+<p>The seventh row stays a cross in version 1. Version 1 records the
+query, and it does not name the fields. From version 2 we can name which
+fields sat above the reader’s role. A tick on that row still does not
+mean we keep the values.</p>
+<p>Sensitive access stays open for leads through version 2, so the
+eighth row is a cross until version 3. On a Tuesday afternoon Anton
+opens a window, confirms with a hardware key, and a second person is
+told at that moment. The grant expires on its own. The key is a stepping
+stone. A touch proves a person was there. It does not prove what they
+approved. A standard key has no screen, so on a laptop that is already
+compromised the program that talks to the key can lie about the payload.
+Version 3 can run beside version 2.</p>
+<p>A command on a server is unrecorded through version 3. Version 4 puts
+a gateway in front and leaves the direct path open, so the ninth row
+ticks and the tenth stays a cross. People use the gateway. When it
+fails, they use the path they already have. The direct path comes down
+only after the gateway has been the normal way for a long stretch. The
+friction is the comfort. The person on call goes through a door so a
+stolen laptop is no longer enough.</p>
+<p>Version 5 is that same door, once it is the only one. The tenth row
+ticks because there is nowhere else to run a command. A refund that
+never shows the seed, and one confidential trace for one hour, are not
+on this table. Version 5 makes them possible. Building them is not part
+of version 5. Leave the table up through this. Take it down before the
+close.</p>
+<p><strong>More:</strong></p>
+<p>Down is how to read a cell, then the two rejected paths with Vlad and
+poa-bridge-manager, then the key cut and the parallel door. Do not
+mention agents while this slide is up.</p>
+</aside>
+</section>
+<section id="matrix--review"
+class="slide level2 closing review stay-dark">
+<h2 class="closing review stay-dark">Review · the row says bastion</h2>
+<p class="kicker">
+Not for the room. 22 Oct. Remove before the pitch.
+</p>
+<ul>
+<li><strong>Heard.</strong> The word on the door is bastion server.
+Break-glass is how the direct path lives while it is being measured down
+to zero.</li>
+<li><strong>Your words.</strong> The ninth row is “A gateway command is
+on the record, typed apart from the output.” A later down says gateway.
+The rest of the ten rows match the source. Version 1 stays a cross on
+naming the fields. The refund and the one-hour trace stay off the
+grid.</li>
+<li><strong>Suggested row.</strong> “A bastion command is on the record,
+typed apart from the output.” Spoken, on that row: the direct path is
+still open, a session on it is not recorded, and that path is measured,
+break-glass first, until people are comfortable.</li>
+<li>Leave the table up through version 5. Take it down before the close.
+That part of the telling stays.</li>
+</ul>
+<aside class="notes">
+<p>Review slide for the 22 Oct notes. Skip it in the room.</p>
+</aside>
+</section>
+<section id="matrix--how-to-read"
+class="slide level2 closing stay-dark">
+<h2 class="closing stay-dark">How to read a cell</h2>
+<p class="depth">
+A little more
+</p>
+<ul>
+<li>A tick means the question is yes, and it stays yes in later columns.
+A cross means that question is not yet true.</li>
+<li>The limit is in the question. A service that has moved. The fields,
+and not the rows. A command that went through the gateway, typed apart
+from the output.</li>
+<li>Version 1 records the query. The fields row stays a cross there. A
+tick from version 2 names the fields. It does not mean the values were
+kept.</li>
+<li>A refund that never shows the seed, and one confidential trace, are
+not rows. Version 5 makes them possible. Building either one is not part
+of version 5.</li>
+</ul>
+<aside class="notes">
+<p>A tick means yes, and it stays yes. A cross means not yet. The limit
+sits in the question: a service that has moved, the fields and not the
+rows, a command that went through the gateway. Version 1 records the
+query, so the fields row stays a cross until version 2, and a tick there
+still does not keep the values. The refund and the one trace are spoken
+with version 5. They are not on the grid.</p>
+</aside>
+</section>
+<section id="matrix--third-path" class="slide level2 closing stay-dark">
+<h2 class="closing stay-dark">Why version 1 is the third path</h2>
+<p class="depth mid">
+More
+</p>
+<ul>
+<li>Labelling every line, in all thirty services, before anyone new can
+read. The first engineer stays blocked until a shared logger and every
+sensitivity kind exist.</li>
+<li>Doing that fully in one service. That service becomes correct. The
+other services stay as they are, so a second team still has no role to
+join.</li>
+<li>Version 1 is roles on one tier per service. The roles survive into
+version 2. They are not rebuilt when the label moves from the service
+onto the line.</li>
+<li>Vlad joins the bridge team on Monday. His lead adds him to bridge
+engineer once. He reads tier 2 and tier 3 the same day.
+poa-bridge-manager stays labelled as a whole: one key-lifecycle line,
+and the rest ordinary. Either the ordinary part stays closed, or that
+line leaks. The moved-service row ticks when version 2 moves that one
+service.</li>
+</ul>
+<aside class="notes">
+<p>Labelling every line across every service blocks the first engineer
+until the logger exists. Doing that fully in one service makes that
+service correct and leaves everyone else where they are. Version 1 is a
+role on one tier per service, and poa-bridge-manager stays labelled as a
+whole until version 2 moves it. That is when the moved-service row
+ticks.</p>
+</aside>
+</section>
+<section id="matrix--window-door"
+class="slide level2 closing stay-dark">
+<h2 class="closing stay-dark">The window, then the door</h2>
+<p class="depth high">
+In detail
+</p>
+<ul>
+<li>Tuesday afternoon. Anton does not hold sensitive access open. He
+opens a window, confirms with a hardware key, a second person is told,
+and the grant expires. Any current tier 1 holder can approve another
+engineer’s temporary request.</li>
+<li>The key is a stepping stone. A touch proves a person was there. It
+does not prove what they approved. The key has no screen. On a laptop
+that is already compromised, the program that talks to the key can lie
+about the payload, and a second touch can be prompted as if the first
+failed. An unexpected second touch is a stop. A stolen laptop finds the
+window closed. A compromised laptop during an open window is not covered
+by the key alone.</li>
+<li>Version 4 puts a gateway in front of server commands and database
+queries. The direct path stays open, and a session that goes around the
+gateway is not recorded. People use the gateway. When it fails, they use
+the path they already have. The direct path comes down only after the
+gateway has been the normal way for a long stretch. The gateway row
+ticks here. The direct-path row stays a cross.</li>
+<li>The friction is the comfort. The person on call goes through a door
+so a stolen laptop is no longer enough.</li>
+<li>Version 5 removes that path. The direct-path row ticks because there
+is nowhere else to run a command. The refund and the one confidential
+trace stay off this table.</li>
+</ul>
+<aside class="notes">
+<p>Anton opens a window on Tuesday, confirms with a hardware key, and a
+second person is told. A touch proves he was there, and it does not
+prove what he approved, because the key has no screen. Version 4 records
+a command only when it went through the gateway, so that row ticks while
+the direct path is still a cross. Version 5 ticks the direct-path row
+because that path is gone. The refund and the one trace stay off the
+table.</p>
+</aside>
+</section></section>
+<section>
+<section id="circle" class="title-slide slide level1 vision stay-dark">
+<h1 class="vision stay-dark"><span class="prefix">This versioned
+approach:</span> the path of least friction to this vision</h1>
+<p class="kicker">
+The vision
+</p>
+<div class="cards">
+<div class="card">
+<h3>
+Crypto Card Market &amp; Data integrity
+</h3>
+<p>
+It is not negotiable to have great control over our data as we expand
+into markets that mirror traditional finance.
+</p>
+</div>
+<div class="card">
+<h3>
+Refunds And Sanctioned Liquidity
+</h3>
+<p>
+A manual refund runs without revealing the data. Partnerships with
+sanctioned liquidity providers run the release.
+</p>
+</div>
+<div class="card">
+<h3>
+Independent team scaling
+</h3>
+<p>
+Legal can have twenty levels. Frontend can stop at a read. Teams scale
+to the hierarchy of their needs.
+</p>
+</div>
+<div class="card">
+<h3>
+An environment for agents
+</h3>
+<p>
+Imagine an environment with agents. The control is granular enough that
+an agent can run without blowing up production.
+</p>
+</div>
+</div>
+<aside class="notes">
+<p>The versioned approach is the path of least friction to the long-term
+vision. The four cards are that vision. Great control over our data is
+not negotiable. A refund runs without revealing the data. Legal can have
+twenty levels, and frontend can stop at a read. Teams scale to the
+hierarchy of their needs. Imagine an environment with agents. The next
+slide is AI factories and confidential inference. The slide after that
+is the one sentence, said once.</p>
+<p><strong>More:</strong></p>
+<p>Stay on the tie. Versions one to five are how we reach these four. AI
+factories is the next slide. The hundred-times sentence closes.</p>
+</aside>
+</section>
+<section id="circle--review"
+class="slide level2 vision stay-dark review">
+<h2 class="vision stay-dark review">Review · the four cards are
+copied</h2>
+<p class="kicker">
+Not for the room. 22 Oct. Remove before the pitch.
+</p>
+<ul>
+<li><strong>Heard.</strong> The quotes he wants kept live on these
+cards: control over our data is not negotiable, teams scale to the depth
+they need, and the agent environment gets a breath. “Uniquely
+positioned” is the competition line beside the first card.</li>
+<li><strong>Your words.</strong> These four cards match “Wouldn’t it be
+nice,” including great control, twenty levels, and the agent
+environment. The spoken note calls this the path of least friction back
+to the vision.</li>
+<li><strong>Suggested.</strong> When a card string changes on “Wouldn’t
+it be nice,” change it here in the same pass. Spoken, this slide is the
+tie: the five steps are how those four become true. The factories slide
+and the last sentence stay after it.</li>
+<li>The pace pair, if it has not been said since “Where we are”: it will
+not be fully done in a year or two, and the five steps are how it keeps
+improving.</li>
+</ul>
+<aside class="notes">
+<p>Review slide for the 22 Oct notes. Skip it in the room.</p>
+</aside>
+</section></section>
+<section>
+<section id="factories"
+class="title-slide slide level1 vision stay-dark">
+<h1 class="vision stay-dark"><span class="prefix">Where NEAR is
+going:</span> AI factories and confidential inference</h1>
+<p class="hook">
+Debugging and release move onto agents. Roles, tiers, and sensitivity
+hold the line.
+</p>
+<div class="cards">
+<div class="card">
+<h3>
+Create
+</h3>
+<p>
+An agent drafts the change. It reads only the tier its role holds. The
+record says what it touched.
+</p>
+</div>
+<div class="card">
+<h3>
+Debug
+</h3>
+<p>
+Confidential logs go to an agent on NEAR AI. The inference does not go
+to Anthropic or OpenAI. Only the investigation report comes back.
+</p>
+</div>
+<div class="card">
+<h3>
+Release
+</h3>
+<p>
+An agent runs the release commands its role allows. Above the line, a
+person approves, and the grant expires.
+</p>
+</div>
+<div class="card">
+<h3>
+Prove
+</h3>
+<p>
+Inside confidential compute the agent sees the data. The queries that
+leave are checked, and they reveal only aggregates. That is enough to
+name the problem.
+</p>
+</div>
+</div>
+<aside class="notes">
+<p>This is the direction, said once, after the vision is on the table.
+NEAR is going toward AI factories and confidential inference. Creation,
+debugging, and release move onto agents. The same roles, tiers, and
+sensitivity are the environment those agents run in. An agent drafts a
+change and reads only the tier its role holds. Confidential logs go to
+an agent on NEAR AI, the inference stays off Anthropic and OpenAI, and
+only the report comes back. A release command above the line waits for a
+person, and the grant expires. Inside confidential compute the agent
+sees the data, and the queries that leave reveal only aggregates. The
+work can be audited, traced, reviewed, and measured. The hundred-times
+sentence is the next slide, and it is said once.</p>
+<p><strong>More:</strong></p>
+<p>Do not open this earlier. The hundred-times sentence is the next
+slide, and it closes.</p>
+</aside>
+</section>
+<section id="factories--review"
+class="slide level2 vision stay-dark review">
+<h2 class="vision stay-dark review">Review · bonus, or the slide before
+the last</h2>
+<p class="kicker">
+Not for the room. 22 Oct. Remove before the pitch.
+</p>
+<ul>
+<li><strong>Heard.</strong> He would consider a bonus reveal, or a
+separate less-polished deck, “Agentic AI software factories.” He also
+offered to present the sandbox slide. In the 19 Oct session, at
+01:30:28, he placed this argument once, at the end, because people
+remember the beginning and the end.</li>
+<li><strong>Your words.</strong> This face is already that end: create,
+debug, release, prove. The sandbox case study earlier in the deck is the
+picture he wants reworked into boxes, with MPC left off the glass. That
+rework is on the case-study slide.</li>
+<li><strong>Suggested.</strong> These four cards stay in front of the
+last sentence. The sealed room follows the bulletproof sandbox case
+study. If you decide the C-suite hour should not carry factories, this
+face becomes a down under the last slide, and he presents the sandbox
+slide. A second deck waits until you ask for it.</li>
+<li>“Uniquely positioned” stays on “Wouldn’t it be nice.” This slide
+stays the mechanism: the report comes back, the logs stay, a command
+above the line waits for a person.</li>
+</ul>
+<aside class="notes">
+<p>Review slide for the 22 Oct notes. Skip it in the room.</p>
+</aside>
+</section></section>
+<section>
+<section id="mic" class="title-slide slide level1 mic stay-dark">
+<h1 class="mic stay-dark">Ban agents, and a fire lasts a week</h1>
+<p class="lede">
+Let people run them, and the same fire is fixed in a day, with no record
+and no fence.
+</p>
+<p class="line">
+If we should do this for people, we need it a hundred times more for
+agents.
+</p>
+<aside class="notes">
+<p>Put Axel in the chair. Ban agents, and a fire lasts a week. Let
+people run them, and the same fire is fixed in a day, with no record and
+no fence. Then the sentence, and stop. If we should do this for people,
+we need it a hundred times more for agents.</p>
+</aside>
+</section>
+<section id="mic--review" class="slide level2 mic stay-dark review">
+<h2 class="mic stay-dark review">Review · the end they remember</h2>
+<p class="kicker">
+Not for the room. 22 Oct. Remove before the pitch.
+</p>
+<ul>
+<li><strong>Heard.</strong> People remember the beginning and the end.
+The beginning is the two lines on the first slide. This is the end. A
+breath, then the sentence.</li>
+<li><strong>Your words.</strong> The face is the week, the day, and the
+hundred-times line. In the 19 Oct session, at 01:30:28, he asked for
+this once, after the mechanism, and then stop. The factories slide is
+that mechanism, already in front of this one. The sealed room is with
+the sandbox case study.</li>
+<li><strong>Suggested.</strong> Breath. The two lines. Stop. “Uniquely
+positioned” and the competition thesis stay on “Wouldn’t it be nice.”
+They do not join this sentence.</li>
+<li>If factories moves to a bonus, this slide is still the close, and
+the breath is longer, because the mechanism will have been one
+down.</li>
+</ul>
+<aside class="notes">
+<p>Review slide for the 22 Oct notes. Skip it in the room.</p>
+</aside>
+</section></section>
+    </div>
+  </div>
+
+  <script src="vendor/reveal.js/dist/reveal.js"></script>
+
+  <!-- reveal.js plugins -->
+  <script src="vendor/reveal.js/plugin/notes/notes.js"></script>
+  <script src="vendor/reveal.js/plugin/search/search.js"></script>
+  <script src="vendor/reveal.js/plugin/zoom/zoom.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+        // Display controls in the bottom right corner
+        controls: true,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'bottom-right',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'h.v',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'default',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: true,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1280,
+
+        height: 720,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0,
+
+        // reveal.js plugins
+        plugins: [
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    </body>
+</html>

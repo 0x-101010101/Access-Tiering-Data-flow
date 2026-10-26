@@ -1,0 +1,1235 @@
+/* NEAR deck. Tokens live in vendor/near/near-tokens.css (FK Grotesk, #00EC97, black canvas).
+   Green is a light, not a fill. Depth on dark is a hairline, not a shadow.
+   The star tiles are a geometric stand-in for the brand sparkle; the official
+   Star_*.svg files were not in the handoff. */
+@import url("vendor/near/near-tokens.css");
+
+:root {
+  --r-background-color: var(--near-black);
+  --r-main-font: var(--font-body);
+  --r-heading-font: var(--font-display);
+  --r-main-color: var(--fg-1);
+  --r-heading-color: var(--fg-1);
+  --r-main-font-size: 28px;
+  --r-heading-font-size: 1em;
+  --r-heading-font-weight: 500;
+  --r-heading-letter-spacing: -0.03em;
+  --r-heading-text-transform: none;
+  --r-heading-line-height: 1.05;
+  --r-link-color: var(--near-green);
+  --r-link-color-hover: var(--green-300);
+  --r-heading1-size: 1.85em;
+  --r-heading2-size: 1.4em;
+  --r-heading3-size: 0.92em;
+  --r-selection-background-color: var(--near-green);
+  --r-selection-color: var(--near-black);
+
+  --tint-green: rgba(0, 236, 151, 0.14);
+  --tint-warning: rgba(232, 194, 74, 0.16);
+  --tint-info: rgba(95, 160, 181, 0.18);
+}
+
+html, body {
+  background: var(--near-black);
+  color-scheme: dark;
+}
+
+.reveal-viewport,
+.reveal,
+.reveal .slides,
+.reveal .backgrounds,
+.reveal .slide-background {
+  background: var(--near-black) !important;
+  background-color: var(--near-black) !important;
+}
+
+.reveal {
+  color: var(--fg-1);
+  font-family: var(--font-body);
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+}
+
+.reveal .slides section,
+.reveal .slides section > section {
+  color: var(--fg-1);
+  text-align: left;
+  /* width:100% plus side padding was content-box, so the right inset
+     sat past the edge and got clipped. Stretch, then pad inside. */
+  box-sizing: border-box !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: auto !important;
+  padding: 68px 36px 28px;
+  transition: none !important;
+}
+.reveal .slide-background {
+  transition: none !important;
+}
+/* Absolute slides otherwise shrink to their text, so the corner mark
+   lands mid-slide. The frame is the slides box. */
+.reveal .slides > section:not(.stack),
+.reveal .slides > section > section {
+  min-height: 100%;
+}
+/* The down-steps are the dense ones. Keep the pitch at full size.
+   A version face inside a stack must stay at the deck size, or the
+   stepper and the type sit higher than the version slides with no down-step. */
+.reveal .slides > section > section {
+  font-size: 0.92em;
+  padding-bottom: 16px;
+}
+.reveal .slides > section > section.rail {
+  font-size: var(--r-main-font-size);
+  padding-bottom: 28px;
+}
+
+.reveal h1,
+.reveal h2,
+.reveal h3,
+.reveal h4 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  text-transform: none;
+  color: var(--fg-1);
+  letter-spacing: var(--tracking-head);
+  text-shadow: none;
+}
+
+.reveal h1 { font-size: 1.85em; line-height: 1.05; margin: 0 0 32px; }
+.reveal h1 .prefix { color: var(--near-green); }
+.reveal h2 { font-size: 1.32em; line-height: 1.1; margin: 0 0 20px; }
+.reveal h3 { font-size: 0.72em; line-height: 1.2; margin: 0 0 8px; color: var(--fg-1); font-weight: 500; }
+
+.reveal p { font-size: 0.72em; font-weight: 400; line-height: 1.45; letter-spacing: 0; color: var(--fg-2); margin: 0.4em 0; }
+.reveal strong { font-weight: 500; color: var(--fg-1); }
+.reveal a { color: var(--fg-1); text-decoration: none; }
+.reveal a:hover { color: var(--near-green); }
+
+.reveal ul, .reveal ol { display: block; margin: 0.2em 0 0; }
+.reveal ul { list-style: none; margin-left: 0; }
+.reveal li {
+  position: relative;
+  margin: 0.12em 0;
+  padding-left: 1.05em;
+  font-size: 0.72em;
+  font-weight: 400;
+  line-height: 1.45;
+  letter-spacing: 0;
+  color: var(--fg-2);
+}
+.reveal ul li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.42em;
+  width: 0.42em;
+  height: 0.42em;
+  background: var(--near-green);
+  clip-path: polygon(50% 0%, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0% 50%, 38% 38%);
+}
+
+/* Sparkle ruler and the lowercase wordmark. Official N-tile art was not in the handoff. */
+.reveal .slides > section:not(:has(> section))::before,
+.reveal .slides > section > section::before {
+  content: "";
+  position: absolute;
+  top: 18px;
+  left: 36px;
+  right: 96px;
+  height: 12px;
+  background-image:
+    url("vendor/near/assets/star-green.svg"),
+    url("vendor/near/assets/star-green.svg"),
+    url("vendor/near/assets/star-green.svg"),
+    url("vendor/near/assets/star-green.svg"),
+    url("vendor/near/assets/star-white.svg");
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, repeat-x;
+  background-size: 36px 12px, 36px 12px, 36px 12px, 36px 12px, 36px 12px;
+  background-position: 0 0, 216px 0, 432px 0, 864px 0, 0 0;
+  pointer-events: none;
+}
+.reveal .slides > section:not(:has(> section))::after,
+.reveal .slides > section > section::after {
+  content: "near";
+  position: absolute;
+  top: 15px;
+  right: 36px;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 16px;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--near-off-white);
+  pointer-events: none;
+}
+
+.reveal .path {
+  margin: -12px 0 16px;
+  font-size: 0.84em;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  color: var(--near-green);
+}
+.reveal .kicker,
+.reveal .depth {
+  display: block;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.46em;
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--near-green);
+  margin: 0 0 28px;
+}
+.reveal .depth.mid { color: var(--warning); }
+.reveal .depth.high { color: var(--info); }
+
+.reveal .lede {
+  font-size: 1.02em;
+  line-height: 1.28;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--fg-1);
+  max-width: 18em;
+  margin: 0 0 36px;
+}
+
+.reveal .dest,
+.reveal .line {
+  background: transparent;
+  border-radius: 0;
+  border-left: 3px solid var(--near-green);
+  padding: 0.05em 0 0.05em 0.75em;
+}
+.reveal .dest {
+  font-family: var(--font-body);
+  font-size: 0.78em;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.45;
+  color: var(--fg-2);
+  margin: 36px 0 0;
+  max-width: 36em;
+}
+.reveal .line {
+  font-family: var(--font-display);
+  font-size: 1.15em;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: var(--fg-1);
+  margin: 40px 0 0;
+  max-width: 16em;
+}
+
+.reveal .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 8px; }
+.reveal .cols { display: flex; gap: 14px; }
+.reveal .cols .card { flex: 1; }
+.reveal .ask { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.reveal .ask .card h3 { font-size: 0.95em; }
+
+.reveal .card,
+.reveal .step {
+  background: var(--gray-800);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: none;
+}
+.reveal .card { padding: 18px 20px 20px; }
+.reveal .card h3 { font-size: 0.86em; color: var(--near-green); }
+.reveal .card p { margin: 0.2em 0 0; font-size: 0.72em; line-height: 1.4; color: var(--fg-2); }
+.reveal .card .when {
+  margin: 0 0 0.45em;
+  font-size: 0.46em;
+  font-weight: 500;
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--near-green);
+}
+
+.reveal .steps { display: flex; gap: 10px; margin-top: 8px; }
+.reveal .step {
+  flex: 1;
+  padding: 14px 12px 16px;
+  border-top: 3px solid var(--near-green);
+  border-radius: var(--radius-md);
+}
+.reveal .step.mid { border-top-color: var(--teal-cyan); }
+.reveal .step.long { border-top-color: var(--gray-500); }
+.reveal .step .tag {
+  margin: 0;
+  font-size: 0.42em;
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--fg-3);
+}
+.reveal .step h3 { font-size: 0.64em; margin: 0.28em 0 0.15em; }
+.reveal .step p { font-size: 0.52em; margin: 0; line-height: 1.35; color: var(--fg-2); }
+
+.reveal .muted { color: var(--fg-2); }
+.reveal .small, .reveal .small li { font-size: 0.78em; }
+.reveal .ok { color: var(--near-green); font-weight: 500; }
+.reveal .no { color: var(--fg-3); font-weight: 500; }
+.reveal .part { color: var(--warning); font-weight: 500; }
+
+.reveal table {
+  font-size: 0.56em;
+  border-collapse: separate;
+  border-spacing: 5px 4px;
+  margin: 0.1em 0 0;
+  width: 100%;
+}
+.reveal table th,
+.reveal table td {
+  padding: 0.38em 0.35em;
+  border-bottom: none;
+  border-radius: 6px;
+  text-align: center;
+  background: transparent;
+  color: var(--fg);
+}
+.reveal table th {
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+.reveal table td:first-child,
+.reveal table th:first-child { text-align: left; border-radius: 0; }
+.reveal .matrix td.yes,
+.reveal .matrix td.no {
+  background: transparent;
+  box-shadow: none;
+  font-weight: 500;
+}
+.reveal .matrix td.yes { color: var(--near-green); }
+.reveal .matrix td.no { color: #ff5c5c; }
+.reveal #matrix .ok { color: var(--near-green); }
+.reveal #matrix .no { color: #ff5c5c; }
+.reveal #matrix {
+  padding-top: 36px;
+}
+.reveal #matrix h1 {
+  font-size: 1.28em;
+  margin-bottom: 8px;
+}
+.reveal #matrix .kicker {
+  margin-bottom: 8px;
+}
+.reveal #matrix table {
+  font-size: 0.7em;
+  table-layout: fixed;
+  border-spacing: 0 0;
+}
+.reveal #matrix table th,
+.reveal #matrix table td {
+  padding: 0.48em 0.15em;
+  line-height: 1.2;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0;
+}
+.reveal #matrix table td:first-child,
+.reveal #matrix table th:first-child {
+  width: 58%;
+  padding-right: 0.6em;
+}
+.reveal #matrix table th:not(:first-child),
+.reveal #matrix table td:not(:first-child) {
+  width: 7%;
+  text-align: center;
+}
+
+/* Roadmap. One summary, then the same rail on each version slide.
+   data-at marks the current step. done / now / ahead are the node states. */
+.reveal .road {
+  --ico-role: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='9' cy='8' r='2.2' fill='white'/%3E%3Cpath d='M4.8 18.2c.5-2.8 2.2-4.2 4.2-4.2s3.7 1.4 4.2 4.2' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round'/%3E%3Ccircle cx='16.2' cy='9.2' r='1.5' fill='white'/%3E%3Cpath d='M14.5 18.2c.3-1.8 1.2-2.8 2.4-2.8 1.1 0 2 .9 2.3 2.8' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E");
+  --ico-line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 7h16M4 12h8M4 17h16' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round'/%3E%3Ccircle cx='16.5' cy='12' r='2.1' fill='white'/%3E%3C/svg%3E");
+  --ico-window: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='4' y='4.5' width='16' height='15' rx='2' fill='none' stroke='white' stroke-width='1.8'/%3E%3Cpath d='M4 9h16' stroke='white' stroke-width='1.8'/%3E%3C/svg%3E");
+  --ico-door: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 4.5h7.5V19.5H6z' fill='none' stroke='white' stroke-width='1.8'/%3E%3Cpath d='M13.5 4.5l4.5 2v11l-4.5 2' fill='none' stroke='white' stroke-width='1.8' stroke-linejoin='round'/%3E%3Ccircle cx='11.2' cy='12' r='.9' fill='white'/%3E%3C/svg%3E");
+  --ico-only: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='7' y='3.5' width='10' height='17' rx='1.2' fill='none' stroke='white' stroke-width='1.8'/%3E%3Ccircle cx='14.2' cy='12' r='.95' fill='white'/%3E%3C/svg%3E");
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin: 8px 0 0;
+}
+.reveal .road .track {
+  position: absolute;
+  z-index: 0;
+  left: 10%;
+  right: 10%;
+  height: 2px;
+  background: var(--border-strong);
+  pointer-events: none;
+}
+.reveal .road.full .track { top: 26px; }
+.reveal .road-why { margin: 20px 0 0; }
+.reveal .road-why li { margin: 0.08em 0; }
+.reveal .road.rail .track { top: 19px; }
+.reveal .road.rail[data-at="1"] .track { background: linear-gradient(90deg, var(--near-green) 0%, var(--border-strong) 0%); }
+.reveal .road.rail[data-at="2"] .track { background: linear-gradient(90deg, var(--near-green) 25%, var(--border-strong) 25%); }
+.reveal .road.rail[data-at="3"] .track { background: linear-gradient(90deg, var(--near-green) 50%, var(--border-strong) 50%); }
+.reveal .road.rail[data-at="4"] .track { background: linear-gradient(90deg, var(--near-green) 75%, var(--border-strong) 75%); }
+.reveal .road.rail[data-at="5"] .track { background: var(--near-green); }
+.reveal .road .node { position: relative; z-index: 1; text-align: center; }
+.reveal .road .dot {
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 10px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--near-black);
+  border: 1px solid var(--border-strong);
+}
+.reveal .road .ico {
+  width: 22px;
+  height: 22px;
+  background-color: var(--near-green);
+  -webkit-mask: center / contain no-repeat;
+  mask: center / contain no-repeat;
+}
+.reveal .road .ico-role { -webkit-mask-image: var(--ico-role); mask-image: var(--ico-role); }
+.reveal .road .ico-line { -webkit-mask-image: var(--ico-line); mask-image: var(--ico-line); }
+.reveal .road .ico-window { -webkit-mask-image: var(--ico-window); mask-image: var(--ico-window); }
+.reveal .road .ico-door { -webkit-mask-image: var(--ico-door); mask-image: var(--ico-door); }
+.reveal .road .ico-only { -webkit-mask-image: var(--ico-only); mask-image: var(--ico-only); }
+.reveal .road .when {
+  margin: 0;
+  font-size: 0.4em;
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--near-green);
+}
+.reveal .road .node.mid .when { color: var(--teal-cyan); }
+.reveal .road .node.long .when { color: var(--fg-2); }
+.reveal .road .node h3 {
+  font-size: 0.62em;
+  margin: 0.28em 0 0.12em;
+  color: var(--fg-1);
+}
+.reveal .road .blurb {
+  margin: 0 6px;
+  font-size: 0.46em;
+  line-height: 1.35;
+  color: var(--fg-2);
+}
+.reveal .road.full .node.mid .ico { background-color: var(--teal-cyan); }
+.reveal .road.full .node.long .ico { background-color: var(--fg-1); }
+.reveal .road.rail .blurb { display: none; }
+.reveal .road.rail .dot { width: 40px; height: 40px; margin-bottom: 8px; }
+.reveal .road.rail .ico { width: 18px; height: 18px; }
+.reveal .road.rail .node h3 { font-size: 0.5em; }
+.reveal .road .node.ahead { opacity: 0.42; }
+.reveal .road .node.ahead .ico { background-color: var(--fg-2); }
+.reveal .road .node.done .dot { border-color: var(--near-green); }
+.reveal .road .node.done .ico { background-color: var(--near-green); }
+.reveal .road .node.now .dot {
+  background: var(--near-green);
+  border-color: var(--near-green);
+  box-shadow: 0 0 0 5px rgba(0, 236, 151, 0.16);
+}
+.reveal .road .node.now .ico { background-color: var(--near-black); }
+.reveal .road .node.now h3 { color: var(--near-green); }
+.reveal .rail h1 { font-size: 1.45em; margin-bottom: 12px; }
+.reveal .mic h1,
+.reveal .cold h1 {
+  font-size: 1.7em;
+  line-height: 1.08;
+  max-width: 14em;
+  margin-bottom: 28px;
+}
+.reveal .mic .lede,
+.reveal .cold .lede {
+  font-size: 1.35em;
+  max-width: 16em;
+  margin-bottom: 0;
+}
+.reveal .mic .line,
+.reveal .cold .line {
+  font-size: 1.55em;
+  max-width: 14em;
+  margin-top: 48px;
+}
+.reveal .cold h1 {
+  font-size: 1.05em;
+  font-weight: 500;
+  color: var(--fg-2);
+  margin-bottom: 36px;
+}
+.reveal .cold .lede,
+.reveal .cold .line {
+  font-size: 1.65em;
+}
+.reveal .cold .line { margin-top: 28px; }
+.reveal .mic h1,
+.reveal .mic .lede { font-size: 1.45em; }
+.reveal .mic .line { font-size: 1.7em; }
+.reveal .rail .kicker { margin-bottom: 16px; }
+.reveal .road-body {
+  display: grid;
+  grid-template-columns: 0.9fr 1.2fr;
+  gap: 36px;
+  align-items: start;
+  margin-top: 28px;
+}
+.reveal .road-body .lede { margin: 0; max-width: 12em; }
+.reveal .road-body ul { margin-top: 0.2em; }
+.reveal .road-stack { margin-top: 22px; }
+.reveal .road-objective {
+  margin: 0 0 18px;
+  background: #161919;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 12px;
+  box-shadow: none;
+  padding: 14px 22px 16px;
+}
+.reveal .road-objective h3 {
+  margin: 0;
+  color: var(--near-green);
+  font-size: 0.72em;
+}
+.reveal .road-objective p {
+  margin: 0.3em 0 0;
+  max-width: none;
+  font-size: 0.78em;
+  line-height: 1.4;
+  color: #fff;
+}
+.reveal .road-stack ul { margin: 0; }
+/* A vertical stack is one outer section. The light canvas paints that outer
+   section, and the variables inherit into a .stay-dark child. Reset them. */
+.reveal section.stay-dark {
+  background: #000 !important;
+  color: var(--near-off-white);
+  --fg: var(--near-off-white);
+  --fg-1: #fff;
+  --fg-2: var(--gray-300);
+  --fg-3: var(--gray-400);
+  --border: rgba(255, 255, 255, 0.12);
+  --border-strong: rgba(255, 255, 255, 0.24);
+}
+.reveal section.stay-dark h1,
+.reveal section.stay-dark h2 { color: #fff !important; }
+.reveal section.stay-dark .road-objective {
+  background: #161919 !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
+  box-shadow: none !important;
+}
+.reveal section.stay-dark .road-objective h3 { color: #00EC97 !important; }
+.reveal section.stay-dark .road-objective p { color: #fff !important; }
+body:has(.slides > section.present > section.stay-dark.present),
+body:has(.slides > section.present > section.stay-dark.present) .reveal-viewport,
+body:has(.slides > section.present > section.stay-dark.present) .reveal,
+body:has(.slides > section.present > section.stay-dark.present) .backgrounds,
+body:has(.slides > section.present > section.stay-dark.present) .slide-background.present {
+  background: #000 !important;
+  background-color: #000 !important;
+}
+body:has(.slides > section.present > section.stay-dark.present) .reveal .slide-number {
+  color: var(--gray-400);
+}
+body:has(.slides > section.present > section.stay-dark.present) .reveal .progress {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.reveal #title-slide {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+  padding: 48px 36px 78px;
+  background:
+    radial-gradient(ellipse 48% 70% at 100% 110%, rgba(0, 236, 151, 0.2), transparent 62%),
+    radial-gradient(ellipse 36% 46% at 0% -10%, rgba(15, 169, 140, 0.16), transparent 60%);
+}
+.reveal #title-slide .title {
+  font-size: 3.15em;
+  line-height: 0.98;
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  color: var(--fg-1);
+  margin: 0 0 36px;
+}
+.reveal #title-slide .subtitle {
+  font-size: 1.15em;
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--near-green);
+  max-width: 22em;
+  margin: 0 0 44px;
+}
+.reveal #title-slide .author,
+.reveal #title-slide .date {
+  font-size: 0.68em;
+  font-weight: 400;
+  color: var(--fg-3);
+  margin: 0 0 8px;
+}
+
+.reveal .overview-list ul {
+  columns: 2;
+  column-gap: 2.4em;
+  font-size: 0.64em;
+  list-style: none;
+  margin-left: 0;
+}
+.reveal .overview-list li { break-inside: avoid; padding-left: 0; font-size: 1em; color: var(--fg); }
+.reveal .overview-list li::before { display: none; }
+.reveal .overview-list a { color: var(--fg-1); }
+.reveal .overview-list a:hover { color: var(--near-green); }
+.reveal .ovnum {
+  display: inline-block;
+  width: 2em;
+  color: var(--fg-3);
+  font-family: var(--font-mono);
+  font-variant-ligatures: none;
+}
+.reveal .ovkind { display: inline-block; width: 5.4em; font-size: 0.85em; color: var(--fg-3); }
+.reveal .ovkind.concept { color: var(--fg-2); }
+.reveal .ovkind.vision { color: var(--near-green); }
+.reveal .ovkind.case { color: var(--warning); }
+.reveal .ovkind.closing { color: var(--info); font-weight: 500; }
+.reveal .overview-list li:has(.ovgroup) { margin-top: 0.7em; }
+.reveal .ovgroup {
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.72em;
+  color: var(--fg-3);
+}
+
+.reveal .slide-number {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  left: 16px;
+  right: auto;
+  bottom: 12px;
+  color: var(--fg-3);
+  background: transparent;
+}
+.reveal .progress { background: rgba(255, 255, 255, 0.08); height: 3px; }
+.reveal .progress span { background: var(--near-green); }
+.reveal .controls { color: var(--fg-3); opacity: 0; }
+.reveal .controls:hover { opacity: 0.9; }
+
+/* Systems is plain columns. The other card slides keep the box and the green title. */
+#systems .card {
+  background: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0 8px 0 0;
+}
+#systems .card h3 {
+  color: var(--fg-1);
+  font-size: 0.78em;
+}
+#systems .cols {
+  gap: 28px 40px;
+  margin-top: 12px;
+}
+
+/* Every second slide uses the light canvas: warm gray, black ink,
+   white cards, black sparkle ruler. .stay-dark keeps the version run black. */
+.reveal .slides > section:nth-child(even):not(.stay-dark),
+.reveal .slides > section:nth-child(even):not(.stay-dark) > section:not(.stay-dark) {
+  background: var(--gray-50);
+  color: var(--near-black);
+  --fg: var(--near-black);
+  --fg-1: var(--near-black);
+  --fg-2: var(--gray-600);
+  --fg-3: var(--gray-500);
+  --border: var(--l-border);
+  --border-strong: var(--l-border-strong);
+}
+/* Reveal paints headings white when it still reads the slide ground as dark. */
+.reveal .slides > section:nth-child(even):not(.stay-dark).has-dark-background h1,
+.reveal .slides > section:nth-child(even):not(.stay-dark).has-dark-background h2,
+.reveal .slides > section:nth-child(even):not(.stay-dark) > section:not(.stay-dark).has-dark-background h1,
+.reveal .slides > section:nth-child(even):not(.stay-dark) > section:not(.stay-dark).has-dark-background h2,
+.reveal .slides > section:nth-child(even):not(.stay-dark) h1,
+.reveal .slides > section:nth-child(even):not(.stay-dark) h2,
+.reveal .slides > section:nth-child(even):not(.stay-dark) > section:not(.stay-dark) h1,
+.reveal .slides > section:nth-child(even):not(.stay-dark) > section:not(.stay-dark) h2 {
+  color: var(--near-black);
+}
+.reveal .slides > section:nth-child(even):not(.stay-dark) .card,
+.reveal .slides > section:nth-child(even):not(.stay-dark) > section:not(.stay-dark) .card,
+.reveal .slides > section:nth-child(even):not(.stay-dark) .step,
+.reveal .slides > section:nth-child(even):not(.stay-dark) > section:not(.stay-dark) .step {
+  background: var(--l-bg-raised);
+  border-color: var(--l-border);
+  box-shadow: var(--shadow-md);
+}
+.reveal .slides > section:nth-child(even):not(.stay-dark)::before,
+.reveal .slides > section:nth-child(even):not(.stay-dark) > section:not(.stay-dark)::before {
+  background-image:
+    url("vendor/near/assets/star-green.svg"),
+    url("vendor/near/assets/star-green.svg"),
+    url("vendor/near/assets/star-green.svg"),
+    url("vendor/near/assets/star-green.svg"),
+    url("vendor/near/assets/star-black.svg");
+}
+.reveal .slides > section:nth-child(even):not(.stay-dark)::after,
+.reveal .slides > section:nth-child(even):not(.stay-dark) > section:not(.stay-dark)::after {
+  color: var(--near-black);
+}
+body:has(.slides > section:nth-child(even):not(.stay-dark).present),
+body:has(.slides > section:nth-child(even):not(.stay-dark) > section:not(.stay-dark).present) {
+  background: var(--gray-50);
+}
+body:has(.slides > section:nth-child(even):not(.stay-dark).present) .reveal-viewport,
+body:has(.slides > section:nth-child(even):not(.stay-dark).present) .reveal,
+body:has(.slides > section:nth-child(even):not(.stay-dark).present) .backgrounds,
+body:has(.slides > section:nth-child(even):not(.stay-dark).present) .slide-background.present,
+body:has(.slides > section:nth-child(even):not(.stay-dark) > section:not(.stay-dark).present) .reveal-viewport,
+body:has(.slides > section:nth-child(even):not(.stay-dark) > section:not(.stay-dark).present) .reveal,
+body:has(.slides > section:nth-child(even):not(.stay-dark) > section:not(.stay-dark).present) .backgrounds,
+body:has(.slides > section:nth-child(even):not(.stay-dark) > section:not(.stay-dark).present) .slide-background.present {
+  background: var(--gray-50) !important;
+  background-color: var(--gray-50) !important;
+}
+body:has(.slides > section:nth-child(even):not(.stay-dark).present) .reveal .slide-number,
+body:has(.slides > section:nth-child(even):not(.stay-dark) > section:not(.stay-dark).present) .reveal .slide-number {
+  color: var(--gray-500);
+}
+body:has(.slides > section:nth-child(even):not(.stay-dark).present) .reveal .progress,
+body:has(.slides > section:nth-child(even):not(.stay-dark) > section:not(.stay-dark).present) .reveal .progress {
+  background: rgba(0, 0, 0, 0.08);
+}
+body:has(.slides > section:nth-child(even):not(.stay-dark).present) .reveal .controls,
+body:has(.slides > section:nth-child(even):not(.stay-dark) > section:not(.stay-dark).present) .reveal .controls {
+  color: var(--gray-700);
+}
+
+/* A slide can ask for the light canvas on its own, whatever its place in the run. */
+.reveal .slides > section.light,
+.reveal .slides > section.light > section:not(.stay-dark) {
+  background: var(--gray-50);
+  color: var(--near-black);
+  --fg: var(--near-black);
+  --fg-1: var(--near-black);
+  --fg-2: var(--gray-600);
+  --fg-3: var(--gray-500);
+  --border: var(--l-border);
+  --border-strong: var(--l-border-strong);
+}
+.reveal .slides > section.light.has-dark-background h1,
+.reveal .slides > section.light.has-dark-background h2,
+.reveal .slides > section.light > section:not(.stay-dark).has-dark-background h1,
+.reveal .slides > section.light > section:not(.stay-dark).has-dark-background h2,
+.reveal .slides > section.light h1,
+.reveal .slides > section.light h2,
+.reveal .slides > section.light > section:not(.stay-dark) h1,
+.reveal .slides > section.light > section:not(.stay-dark) h2 {
+  color: var(--near-black);
+}
+.reveal .slides > section.light .card,
+.reveal .slides > section.light > section:not(.stay-dark) .card {
+  background: var(--l-bg-raised);
+  border-color: var(--l-border);
+  box-shadow: var(--shadow-md);
+}
+.reveal .slides > section.light::before,
+.reveal .slides > section.light > section:not(.stay-dark)::before {
+  background-image:
+    url("vendor/near/assets/star-green.svg"),
+    url("vendor/near/assets/star-green.svg"),
+    url("vendor/near/assets/star-green.svg"),
+    url("vendor/near/assets/star-green.svg"),
+    url("vendor/near/assets/star-black.svg");
+}
+.reveal .slides > section.light::after,
+.reveal .slides > section.light > section:not(.stay-dark)::after {
+  color: var(--near-black);
+}
+.reveal section.light .road.full .node.long .ico { background-color: #fff; }
+body:has(.slides > section.light.present),
+body:has(.slides > section.light > section:not(.stay-dark).present) {
+  background: var(--gray-50);
+}
+body:has(.slides > section.light.present) .reveal-viewport,
+body:has(.slides > section.light.present) .reveal,
+body:has(.slides > section.light.present) .backgrounds,
+body:has(.slides > section.light.present) .slide-background.present,
+body:has(.slides > section.light > section:not(.stay-dark).present) .reveal-viewport,
+body:has(.slides > section.light > section:not(.stay-dark).present) .reveal,
+body:has(.slides > section.light > section:not(.stay-dark).present) .backgrounds,
+body:has(.slides > section.light > section:not(.stay-dark).present) .slide-background.present {
+  background: var(--gray-50) !important;
+  background-color: var(--gray-50) !important;
+}
+body:has(.slides > section.light.present) .reveal .slide-number,
+body:has(.slides > section.light > section:not(.stay-dark).present) .reveal .slide-number {
+  color: var(--gray-500);
+}
+body:has(.slides > section.light.present) .reveal .progress,
+body:has(.slides > section.light > section:not(.stay-dark).present) .reveal .progress {
+  background: rgba(0, 0, 0, 0.08);
+}
+/* A vertical stack keeps the light canvas when its place in the run changes.
+   The class sits on the inner section; the outer wrapper has none. */
+.reveal .slides > section:has(> section.light) > section.light {
+  background: var(--gray-50);
+  color: var(--near-black);
+  --fg: var(--near-black);
+  --fg-1: var(--near-black);
+  --fg-2: var(--gray-600);
+  --fg-3: var(--gray-500);
+  --border: var(--l-border);
+  --border-strong: var(--l-border-strong);
+}
+.reveal .slides > section:has(> section.light) > section.light h1,
+.reveal .slides > section:has(> section.light) > section.light h2 {
+  color: var(--near-black);
+}
+.reveal .slides > section:has(> section.light) > section.light .card,
+.reveal .slides > section:has(> section.light) > section.light .step {
+  background: var(--l-bg-raised);
+  border-color: var(--l-border);
+  box-shadow: var(--shadow-md);
+}
+.reveal .slides > section:has(> section.light) > section.light::before {
+  background-image:
+    url("vendor/near/assets/star-green.svg"),
+    url("vendor/near/assets/star-green.svg"),
+    url("vendor/near/assets/star-green.svg"),
+    url("vendor/near/assets/star-green.svg"),
+    url("vendor/near/assets/star-black.svg");
+}
+.reveal .slides > section:has(> section.light) > section.light::after {
+  color: var(--near-black);
+}
+body:has(.slides > section.present > section.light.present),
+body:has(.slides > section.present > section.light.present) .reveal-viewport,
+body:has(.slides > section.present > section.light.present) .reveal,
+body:has(.slides > section.present > section.light.present) .backgrounds,
+body:has(.slides > section.present > section.light.present) .slide-background.present {
+  background: var(--gray-50) !important;
+  background-color: var(--gray-50) !important;
+}
+body:has(.slides > section.present > section.light.present) .reveal .slide-number {
+  color: var(--gray-500);
+}
+body:has(.slides > section.present > section.light.present) .reveal .progress {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+/* The four problem slides. Same row layout on the light slides and the dark ones. */
+.reveal .cards.band {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 22px;
+}
+.reveal .cards.band .card,
+.reveal .slides > section:nth-child(even):not(.stay-dark) .cards.band .card,
+.reveal .slides > section:nth-child(even):not(.stay-dark) > section:not(.stay-dark) .cards.band .card {
+  display: grid;
+  grid-template-columns: 52px 1fr;
+  column-gap: 16px;
+  align-items: center;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  border-bottom: 1px solid var(--border-strong);
+  padding: 16px 2px;
+}
+.reveal .cards.band .card::before {
+  content: "";
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: var(--near-black);
+  box-shadow: inset 0 0 0 1px var(--border-strong);
+  background-image: var(--band-icon);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 22px 22px;
+}
+.reveal .cards.band .card h3,
+.reveal .cards.band .card p { grid-column: 2; }
+.reveal .cards.band .card h3 { margin: 0; }
+.reveal .cards.band .card p { margin: 0.12em 0 0; }
+
+.reveal #queue .cards.band .card:nth-child(1) { --band-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='8' cy='8' r='2' fill='none' stroke='white' stroke-width='1.7'/%3E%3Ccircle cx='16' cy='8.5' r='1.6' fill='none' stroke='white' stroke-width='1.7'/%3E%3Cpath d='M3.8 17.5c.5-2.3 2-3.5 4.2-3.5s3.6 1.1 4.1 3.2M13 17.5c.3-1.6 1.3-2.6 2.8-2.6 1.4 0 2.4.9 2.8 2.4' fill='none' stroke='white' stroke-width='1.7' stroke-linecap='round'/%3E%3C/svg%3E"); }
+.reveal #queue .cards.band .card:nth-child(2) { --band-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M14 5.5a5.5 5.5 0 1 0 4.6 8.5A6.2 6.2 0 0 1 14 5.5z' fill='none' stroke='white' stroke-width='1.8' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+.reveal #queue .cards.band .card:nth-child(3) { --band-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='8' r='2.4' fill='none' stroke='white' stroke-width='1.8'/%3E%3Cpath d='M6.5 18.2c.7-2.8 2.6-4.2 5.5-4.2s4.8 1.4 5.5 4.2' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E"); }
+.reveal #queue .cards.band .card:nth-child(4) { --band-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 7h14M5 12h9M5 17h14' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E"); }
+
+.reveal #no-role .cards.band .card:nth-child(1) { --band-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='8' r='2.4' fill='none' stroke='white' stroke-width='1.8'/%3E%3Cpath d='M6.5 18.2c.7-2.8 2.6-4.2 5.5-4.2s4.8 1.4 5.5 4.2' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E"); }
+.reveal #no-role .cards.band .card:nth-child(2) { --band-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8 16.5A6 6 0 1 1 16.2 8' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round'/%3E%3Cpath d='M16 4.8v4.2h-4' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+.reveal #no-role .cards.band .card:nth-child(3) { --band-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 16l5-5 3.2 3.2L20 6' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M14.5 6H20v5.5' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+.reveal #no-role .cards.band .card:nth-child(4) { --band-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='7' fill='none' stroke='white' stroke-width='1.8'/%3E%3Cpath d='M12 8.2V12l2.6 1.8' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E"); }
+
+.reveal #open-data .cards.band .card:nth-child(1) { --band-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 8h4M13 16h4' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round'/%3E%3Cpath d='M11 8l2 8' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round'/%3E%3Ccircle cx='5' cy='8' r='2' fill='none' stroke='white' stroke-width='1.7'/%3E%3Ccircle cx='19' cy='16' r='2' fill='none' stroke='white' stroke-width='1.7'/%3E%3C/svg%3E"); }
+.reveal #open-data .cards.band .card:nth-child(2) { --band-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='8' cy='14' r='3.2' fill='none' stroke='white' stroke-width='1.8'/%3E%3Cpath d='M11 14h8.2M16.5 14v2.2M19.2 14v1.4' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E"); }
+.reveal #open-data .cards.band .card:nth-child(3) { --band-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='4' y='6' width='16' height='11' rx='1.4' fill='none' stroke='white' stroke-width='1.8'/%3E%3Cpath d='M9 20h6' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E"); }
+.reveal #open-data .cards.band .card:nth-child(4) { --band-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 7h16M4 12h10M4 17h16' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round'/%3E%3Cpath d='M15 10.5l4 4M19 10.5l-4 4' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E"); }
+
+.reveal #service-shut .cards.band .card:nth-child(1) { --band-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='4' y='6' width='16' height='11' rx='1.4' fill='none' stroke='white' stroke-width='1.8'/%3E%3Cpath d='M9 20h6' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E"); }
+.reveal #service-shut .cards.band .card:nth-child(2) { --band-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 7h10a2 2 0 0 1 2 2v5H8l-3 3z' fill='none' stroke='white' stroke-width='1.8' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+.reveal #service-shut .cards.band .card:nth-child(3) { --band-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 6h10l2 2H20v10H4z' fill='none' stroke='white' stroke-width='1.8' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+.reveal #service-shut .cards.band .card:nth-child(4) { --band-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='7' fill='none' stroke='white' stroke-width='1.8'/%3E%3Cpath d='M12 8.2V12l2.6 1.8' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E"); }
+
+/* Borrowed faces. His columns, today/could-feel pair, JSON, and diagrams,
+   restyled with our tokens. The SVG stays his; the colours follow the slide. */
+.reveal #what-we-want .kicker {
+  font-size: 0.78em;
+  letter-spacing: -0.02em;
+  text-transform: none;
+  line-height: 1.3;
+  margin-bottom: 10px;
+}
+.reveal #what-we-want .hook { max-width: none; margin-bottom: 16px; }
+
+.reveal .hook {
+  font-family: var(--font-display);
+  font-size: 1.02em;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: var(--fg-1);
+  margin: 0 0 20px;
+  max-width: 18em;
+  border-left: 3px solid var(--near-green);
+  padding: 0.02em 0 0.02em 0.7em;
+}
+.reveal #on-the-record .hook,
+.reveal #data-control-flow .hook,
+.reveal #for-them .hook,
+.reveal #where-we-are .hook,
+.reveal #case-card .hook,
+.reveal #factories .hook { max-width: none; }
+.reveal #factories h1 { margin-bottom: 75px; }
+.reveal #factories .hook { margin-bottom: 20px; }
+.reveal #case-card h1 { margin-bottom: 8px; }
+.reveal #case-card .diagram svg { max-height: 270px; }
+.reveal #case-card .dest { margin-top: 10px; }
+.reveal #case-agent h1 { margin-bottom: 8px; }
+.reveal #case-agent .hook { max-width: none; }
+.reveal #case-agent .diagram svg { max-height: 250px; }
+.reveal #case-agent .dest { margin-top: 16px; }
+.reveal #data-control-flow .cards { grid-template-columns: 1fr 1fr 1fr; }
+.reveal #data-control-flow table { font-size: 0.62em; table-layout: fixed; }
+.reveal #data-control-flow table th:nth-child(1),
+.reveal #data-control-flow table td:nth-child(1) { width: 7%; }
+.reveal #data-control-flow table th:nth-child(2),
+.reveal #data-control-flow table td:nth-child(2) { width: 11%; }
+.reveal #data-control-flow table th:nth-child(3),
+.reveal #data-control-flow table td:nth-child(3) { width: 40%; text-align: left; }
+.reveal #data-control-flow table th:nth-child(4),
+.reveal #data-control-flow table td:nth-child(4) { width: 14%; }
+.reveal #data-control-flow table th:nth-child(5),
+.reveal #data-control-flow table td:nth-child(5) { width: 28%; text-align: left; }
+.reveal #data-control-flow table code {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  background: transparent;
+  color: inherit;
+  white-space: normal;
+}
+.reveal .columns { display: flex; gap: 14px; align-items: stretch; }
+.reveal .column { flex: 1 1 0; min-width: 0; max-width: calc(50% - 7px); }
+.reveal .before,
+.reveal .after {
+  background: var(--gray-800);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px 16px;
+}
+.reveal .before { border-left: 4px solid var(--warning); background: var(--tint-warning); }
+.reveal .after { border-left: 4px solid var(--near-green); background: var(--tint-green); }
+.reveal .column strong { color: var(--fg-1); }
+.reveal .column li strong { font-weight: 500; }
+.reveal .column pre { margin: 0.15em 0 0.35em; }
+.reveal .column pre code {
+  font-size: 0.72em;
+  line-height: 1.45;
+  background: transparent;
+  border: none;
+  padding: 0.15em 0 0;
+}
+.reveal section.stay-dark .column.log > p:first-child {
+  font-size: 0.84em;
+  margin: 0 0 0.45em;
+  color: #fff;
+}
+.reveal section.stay-dark .column.log pre { margin: 0 0 0.45em; }
+.reveal section.stay-dark .column.log pre code {
+  display: block;
+  font-size: 0.78em;
+  line-height: 1.4;
+  background: var(--gray-800);
+  color: #fff;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  padding: 20px 22px;
+  white-space: pre;
+}
+.reveal section.stay-dark .column.log > p:last-child {
+  font-size: 0.72em;
+  margin: 0.15em 0 0;
+  color: var(--gray-300);
+}
+.reveal .pair table { width: auto; border-spacing: 18px 8px; }
+.reveal .pair col { width: auto !important; }
+.reveal .pair table td,
+.reveal .pair table th { text-align: left; }
+.reveal pre { width: 100%; margin: 0.3em 0; box-shadow: none; }
+.reveal pre code {
+  font-family: var(--font-mono);
+  font-size: 0.46em;
+  font-weight: 400;
+  line-height: 1.45;
+  background: var(--gray-800);
+  color: var(--fg-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  white-space: pre-wrap;
+}
+.reveal code span { color: inherit !important; font-weight: 400; }
+.reveal .diagram { margin: 0.2em auto; text-align: center; }
+.reveal .diagram svg { max-width: 100%; max-height: 340px; height: auto; }
+.reveal #rbac-applied h1 { margin-bottom: 10px; }
+.reveal #rbac-applied .hook { max-width: none; margin-bottom: 8px; }
+.reveal #rbac-applied .ead-switch {
+  display: inline-block;
+  margin: 0 0 10px;
+  padding: 6px 16px;
+  font-family: var(--font-body);
+  font-size: 0.62em;
+  line-height: 1.2;
+  color: var(--near-black);
+  background: var(--near-green);
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.reveal #rbac-applied .diagram { width: 100%; margin-top: 0; }
+.reveal #rbac-applied .diagram svg { max-height: 360px; }
+.reveal #rbac-applied .dest { margin-top: 8px; font-size: 0.72em; }
+.reveal #rbac-applied #complex-animated-dag {
+  --background: #0c0c0c;
+  --foreground: var(--fg-1);
+  --border: var(--border);
+  --green: var(--near-green);
+  --yellow: #e8c24a;
+  --orange: var(--warning);
+  --red: #ff5c5c;
+}
+.reveal #rbac-applied #ead-stage { width: 100%; }
+.reveal #rbac-applied #ead-stage svg { display: block; width: 100%; height: 320px; }
+.reveal #rbac-applied #ead-stage svg text {
+  font-family: var(--font-body);
+  font-size: 13px;
+}
+.reveal #rbac-applied .viz-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 2px;
+}
+.reveal #rbac-applied .viz-controls button {
+  font-family: var(--font-body);
+  font-size: 0.42em;
+  color: var(--fg-1);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+.reveal #rbac-applied .viz-controls button:disabled { opacity: 0.35; }
+.reveal #rbac-applied #ead-play { border-color: var(--near-green); color: var(--near-green); }
+.reveal #rbac-applied .ead-switch[aria-pressed="true"] { background: transparent; color: var(--near-green); border: 1px solid var(--near-green); }
+.reveal #rbac-applied [hidden] { display: none !important; }
+.reveal #rbac-applied #ead-swap-controls { display: inline-flex; gap: 8px; align-items: center; }
+.reveal #rbac-applied #ead-use svg { display: block; width: 100%; height: 340px; }
+.reveal #rbac-applied #ead-use svg text {
+  font-family: var(--font-body);
+  font-size: 15px;
+  fill: var(--fg-1);
+}
+.reveal #rbac-applied #ead-status {
+  margin-left: 8px;
+  font-size: 0.48em;
+  color: var(--fg-2);
+}
+.reveal #rbac-applied #ead-legend {
+  display: flex;
+  gap: 16px;
+  margin-top: 4px;
+  font-size: 0.42em;
+  color: var(--fg-2);
+}
+.reveal #case-teams h1 { margin-bottom: 8px; }
+.reveal #case-teams .columns { align-items: flex-start; }
+.reveal #case-teams .diagram svg { max-height: 300px; }
+.reveal #case-teams .dest { margin-top: 12px; }
+.reveal #case-refund h1 { margin-bottom: 10px; }
+.reveal #case-refund .diagram { width: 100%; margin-top: 4px; }
+.reveal #case-refund .diagram svg { max-height: 300px; }
+.reveal #case-refund .diagram svg text {
+  fill: #fff;
+  font-size: 14px;
+}
+.reveal #case-refund .diagram svg [fill="#eef2ff"] { fill: #161919; }
+.reveal #case-refund .dest { margin-top: 14px; }
+.reveal #sealed-space,
+.reveal #sealed-in,
+.reveal #sealed-ask,
+.reveal #sealed-reveal,
+.reveal #sealed-audit {
+  padding-top: 46px;
+  padding-bottom: 12px;
+}
+.reveal #sealed-space h1 .prefix,
+.reveal #sealed-in h1 .prefix,
+.reveal #sealed-ask h1 .prefix,
+.reveal #sealed-reveal h1 .prefix,
+.reveal #sealed-audit h1 .prefix {
+  display: block;
+}
+.reveal #sealed-space h1,
+.reveal #sealed-in h1,
+.reveal #sealed-ask h1,
+.reveal #sealed-reveal h1,
+.reveal #sealed-audit h1 {
+  font-size: 1.15em;
+  line-height: 1.15;
+  min-height: 2.45em;
+  margin: 0 0 28px;
+}
+.reveal #sealed-space .diagram,
+.reveal #sealed-in .diagram,
+.reveal #sealed-ask .diagram,
+.reveal #sealed-reveal .diagram,
+.reveal #sealed-audit .diagram {
+  width: 94% !important;
+  margin: 0 auto;
+}
+.reveal #sealed-space .diagram svg,
+.reveal #sealed-in .diagram svg,
+.reveal #sealed-ask .diagram svg,
+.reveal #sealed-reveal .diagram svg { max-height: 560px; }
+.reveal #sealed-audit .diagram svg { max-height: 160px; }
+.reveal #sealed-audit .audit-caption {
+  margin: 2px 0 6px;
+  font-size: 0.48em;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #00EC97;
+}
+.reveal #sealed-audit table { font-size: 0.48em; table-layout: fixed; }
+.reveal #sealed-audit table th:nth-child(1),
+.reveal #sealed-audit table td:nth-child(1) { width: 6%; }
+.reveal #sealed-audit table th:nth-child(2),
+.reveal #sealed-audit table td:nth-child(2) { width: 38%; text-align: left; }
+.reveal #sealed-audit table th:nth-child(3),
+.reveal #sealed-audit table td:nth-child(3) { width: 28%; text-align: left; }
+.reveal #sealed-audit table th:nth-child(4),
+.reveal #sealed-audit table td:nth-child(4) { width: 28%; text-align: left; }
+.reveal #sealed-audit .sealed { color: #D97066; font-weight: 500; }
+.reveal #sealed-audit .dest { margin-top: 10px; font-size: 0.62em; }
+.reveal .diagram svg > g > polygon[fill="white"] { fill: transparent; }
+.reveal .diagram svg text { fill: var(--fg-1); font-family: var(--font-body); }
+.reveal .diagram svg [fill="#eef2ff"],
+.reveal .diagram svg [fill="#f3f4f6"],
+.reveal .diagram svg [fill="#f9fafb"] { fill: var(--gray-800); }
+.reveal .diagram svg [stroke="#6366f1"],
+.reveal .diagram svg [stroke="#059669"] { stroke: var(--near-green); }
+.reveal .diagram svg [fill="#ecfdf5"] { fill: var(--tint-green); }
+.reveal .diagram svg [fill="#fef3c7"] { fill: var(--tint-warning); }
+.reveal .diagram svg [stroke="#d97706"] { stroke: var(--warning); }
+.reveal .diagram svg [fill="#dbeafe"] { fill: var(--tint-info); }
+.reveal .diagram svg [stroke="#2563eb"] { stroke: var(--info); }
+.reveal .diagram svg [fill="#fef2f2"] { fill: rgba(255, 92, 92, 0.14); }
+.reveal .diagram svg [stroke="#dc2626"] { stroke: #ff5c5c; }
+.reveal .diagram svg [stroke="#6b7280"],
+.reveal .diagram svg [stroke="#9ca3af"] { stroke: var(--fg-3); }
+.reveal .diagram svg [fill="#6b7280"],
+.reveal .diagram svg [fill="#9ca3af"] { fill: var(--fg-3); }
+
+.reveal .slides > section:nth-child(even):not(.stay-dark) .before,
+.reveal .slides > section:nth-child(even):not(.stay-dark) .after,
+.reveal .slides > section:nth-child(even):not(.stay-dark) > section:not(.stay-dark) .before,
+.reveal .slides > section:nth-child(even):not(.stay-dark) > section:not(.stay-dark) .after,
+.reveal .slides > section.light .before,
+.reveal .slides > section.light .after,
+.reveal .slides > section.light > section:not(.stay-dark) .before,
+.reveal .slides > section.light > section:not(.stay-dark) .after {
+  background: var(--l-bg-raised);
+  border-color: var(--l-border);
+}
+.reveal .slides > section:nth-child(even):not(.stay-dark) .before,
+.reveal .slides > section:nth-child(even):not(.stay-dark) > section:not(.stay-dark) .before,
+.reveal .slides > section.light .before,
+.reveal .slides > section.light > section:not(.stay-dark) .before { border-left-color: var(--warning); }
+.reveal .slides > section:nth-child(even):not(.stay-dark) .after,
+.reveal .slides > section:nth-child(even):not(.stay-dark) > section:not(.stay-dark) .after,
+.reveal .slides > section.light .after,
+.reveal .slides > section.light > section:not(.stay-dark) .after { border-left-color: var(--near-green); }
+.reveal .slides > section:nth-child(even):not(.stay-dark) .before,
+.reveal .slides > section:nth-child(even):not(.stay-dark) > section:not(.stay-dark) .before,
+.reveal .slides > section.light .before,
+.reveal .slides > section.light > section:not(.stay-dark) .before { background: rgba(232, 194, 74, 0.22); }
+.reveal .slides > section:nth-child(even):not(.stay-dark) .after,
+.reveal .slides > section:nth-child(even):not(.stay-dark) > section:not(.stay-dark) .after,
+.reveal .slides > section.light .after,
+.reveal .slides > section.light > section:not(.stay-dark) .after { background: rgba(0, 236, 151, 0.16); }
+.reveal .slides > section:nth-child(even):not(.stay-dark):not(:has(> section)) .column pre code,
+.reveal .slides > section:nth-child(even):not(.stay-dark) > section:not(.stay-dark) .column pre code,
+.reveal .slides > section.light:not(:has(> section)) .column pre code,
+.reveal .slides > section.light > section:not(.stay-dark) .column pre code {
+  background: transparent;
+  border: none;
+  color: var(--near-black);
+}
+.reveal .slides > section:nth-child(even):not(.stay-dark):not(:has(> section)) pre code,
+.reveal .slides > section:nth-child(even):not(.stay-dark) > section:not(.stay-dark) pre code,
+.reveal .slides > section.light:not(:has(> section)) pre code,
+.reveal .slides > section.light > section:not(.stay-dark) pre code {
+  background: var(--l-bg-raised);
+  color: var(--near-black);
+  border-color: var(--l-border);
+}
+.reveal .slides > section:nth-child(even):not(.stay-dark):not(:has(> section)) .diagram svg [fill="#eef2ff"],
+.reveal .slides > section:nth-child(even):not(.stay-dark):not(:has(> section)) .diagram svg [fill="#f3f4f6"],
+.reveal .slides > section:nth-child(even):not(.stay-dark):not(:has(> section)) .diagram svg [fill="#f9fafb"],
+.reveal .slides > section:nth-child(even):not(.stay-dark) > section:not(.stay-dark) .diagram svg [fill="#eef2ff"],
+.reveal .slides > section:nth-child(even):not(.stay-dark) > section:not(.stay-dark) .diagram svg [fill="#f3f4f6"],
+.reveal .slides > section:nth-child(even):not(.stay-dark) > section:not(.stay-dark) .diagram svg [fill="#f9fafb"],
+.reveal .slides > section.light:not(:has(> section)) .diagram svg [fill="#eef2ff"],
+.reveal .slides > section.light:not(:has(> section)) .diagram svg [fill="#f3f4f6"],
+.reveal .slides > section.light:not(:has(> section)) .diagram svg [fill="#f9fafb"],
+.reveal .slides > section.light > section:not(.stay-dark) .diagram svg [fill="#eef2ff"],
+.reveal .slides > section.light > section:not(.stay-dark) .diagram svg [fill="#f3f4f6"],
+.reveal .slides > section.light > section:not(.stay-dark) .diagram svg [fill="#f9fafb"] {
+  fill: var(--l-bg-raised);
+}
+
+.reveal section.review { font-size: 0.58em; }
+.reveal section.review .kicker { color: var(--warning); margin-bottom: 14px; }
+.reveal section.review h2 { font-size: 1.45em; margin-bottom: 10px; }
+.reveal section.review li { margin-bottom: 0.4em; }
+
+@media print {
+  @page { size: 1280px 720px; margin: 0; }
+  html, body, .reveal, .reveal-viewport, .reveal .slides, .reveal .slide-background {
+    background: #000 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

@@ -1,0 +1,11 @@
+# editor and OS clutter
+*~
+*.swp
+.DS_Store
+Thumbs.db
+.cache/
+build/
+deck/audio/.cache.json
+deck/audio/text/
+__pycache__/
+.shots/

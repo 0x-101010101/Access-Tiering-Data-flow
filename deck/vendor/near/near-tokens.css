@@ -1,0 +1,200 @@
+/* ============================================================
+   NEAR — Colors & Type
+   Foundational + semantic CSS variables for the NEAR brand.
+   Import this once: <link rel="stylesheet" href="colors_and_type.css">
+   Master typeface: FK Grotesk. Signature color: NEAR Green #00EC97.
+   ============================================================ */
+
+/* ---------- Fonts ----------
+   Same woff2 cuts as kernel/monitors (the near.com / intents-explorer files). */
+@font-face {
+  font-family: "FK Grotesk";
+  src: url("fonts/FKGrotesk-Regular.woff2") format("woff2");
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "FK Grotesk";
+  src: url("fonts/FKGrotesk-Medium.woff2") format("woff2");
+  font-weight: 500; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "FK Grotesk";
+  src: url("fonts/FKGrotesk-Bold.woff2") format("woff2");
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "FK Grotesk";
+  src: url("fonts/FKGrotesk-Black.woff2") format("woff2");
+  font-weight: 900; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "FK Grotesk Mono";
+  src: url("fonts/FKGroteskMono-Light.woff2") format("woff2");
+  font-weight: 300; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "FK Grotesk Mono";
+  src: url("fonts/FKGroteskMono-Regular.woff2") format("woff2");
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+
+:root {
+  /* ============ BRAND CORE ============ */
+  --near-green:        #00EC97;  /* signature — the one unmistakable NEAR color */
+  --near-green-bright: #00EF8E;  /* slightly brighter neon variant used in sparkle art */
+  --near-black:        #000000;  /* primary ink + dark canvas */
+  --near-off-white:    #F2F2F1;  /* the "white" in the logo lockup — never pure #fff in marks */
+
+  /* ============ NEUTRAL SCALE (cool, near-black) ============ */
+  --gray-0:   #FFFFFF;
+  --gray-50:  #F4F5F5;  /* light slide / page canvas */
+  --gray-100: #EBECEC;
+  --gray-200: #D6D9D9;
+  --gray-300: #B4B9B9;
+  --gray-400: #8A9090;
+  --gray-500: #5F6565;
+  --gray-600: #3F4444;
+  --gray-700: #262A2A;
+  --gray-800: #161919;  /* raised surface on black */
+  --gray-900: #0B0D0D;  /* deep canvas, just off true black */
+  --gray-950: #050606;
+
+  /* ============ GREEN SCALE (derived from --near-green) ============ */
+  --green-50:  #E5FCF3;
+  --green-100: #B8F7DD;
+  --green-200: #7FF0C2;
+  --green-300: #3FEFAD;
+  --green-400: #00EC97;  /* = brand green */
+  --green-500: #00C880;
+  --green-600: #00A268;
+  --green-700: #007A4F;
+  --green-800: #00543708; /* unused placeholder */
+  --green-deep: #0A2E26;  /* darkest emerald, for imagery shadows */
+
+  /* ============ IMAGERY / GRADIENT TONES ============
+     The cinematic brand renders live in teal→emerald→cyan over blue-black. */
+  --teal-cyan:   #1FE6C8;
+  --teal-mid:    #0FA98C;
+  --teal-deep:   #0A3D3A;
+  --ink-navy:    #06121F;  /* blue-black floor in renders */
+
+  /* ============ SEMANTIC — DARK (default brand surface) ============ */
+  --bg:            var(--near-black);
+  --bg-raised:     var(--gray-800);
+  --bg-sunken:     var(--gray-950);
+  --fg:            var(--near-off-white); /* primary text on dark */
+  --fg-1:          #FFFFFF;
+  --fg-2:          var(--gray-300);       /* secondary text */
+  --fg-3:          var(--gray-400);       /* muted / captions */
+  --accent:        var(--near-green);
+  --accent-ink:    var(--near-black);     /* text/icon ON green */
+  --border:        rgba(255,255,255,0.12);
+  --border-strong: rgba(255,255,255,0.24);
+
+  /* ============ SEMANTIC — LIGHT (the off-white slide) ============ */
+  --l-bg:            var(--gray-50);
+  --l-bg-raised:     #FFFFFF;
+  --l-fg:            var(--near-black);
+  --l-fg-2:          var(--gray-600);
+  --l-fg-3:          var(--gray-500);
+  --l-border:        rgba(0,0,0,0.12);
+  --l-border-strong: rgba(0,0,0,0.22);
+
+  /* ============ STATUS ============ (muted to sit beside NEAR green, not fight it) */
+  --positive: #00EC97;
+  --negative: #D97066;  /* muted clay red */
+  --warning:  #E8C24A;  /* warm yellow-gold */
+  --info:     #5FA0B5;  /* muted slate-teal */
+
+  /* ============ TYPE FAMILIES ============ */
+  --font-display: "FK Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --font-body:    "FK Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --font-mono:    "FK Grotesk Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* ============ TYPE SCALE (display / marketing) ============
+     FK Grotesk wants tight tracking on big sizes, generous leading on body. */
+  --fs-display:  clamp(3.5rem, 7vw, 7rem); /* @kind font */
+  --fs-h1:       clamp(2.5rem, 4.5vw, 4rem); /* @kind font */
+  --fs-h2:       clamp(2rem, 3vw, 3rem);     /* @kind font */
+  --fs-h3:       1.75rem;
+  --fs-h4:       1.375rem;
+  --fs-body-lg:  1.25rem;
+  --fs-body:     1.0625rem;
+  --fs-body-sm:  0.9375rem;
+  --fs-caption:  0.8125rem;
+  --fs-eyebrow:  0.8125rem;
+
+  --lh-tight:   1.02;  /* @kind other */
+  --lh-snug:    1.12;  /* @kind other */
+  --lh-body:    1.55;  /* @kind other */
+
+  --tracking-display: -0.03em;
+  --tracking-head:    -0.02em;
+  --tracking-body:     0em;
+  --tracking-eyebrow:  0.14em;  /* uppercase eyebrows / labels */
+
+  /* ============ RADII ============
+     NEAR rounds softly — the app-icon tile uses an ~11% superellipse-ish radius. */
+  --radius-xs:  4px;
+  --radius-sm:  8px;
+  --radius-md:  12px;
+  --radius-lg:  20px;
+  --radius-pill: 999px;
+  --radius-tile: 22%;  /* the N app-icon tile corner ratio */
+
+  /* ============ SPACING (4px base) ============ */
+  --space-1: 4px;   --space-2: 8px;   --space-3: 12px;  --space-4: 16px;
+  --space-5: 24px;  --space-6: 32px;  --space-7: 48px;  --space-8: 64px;
+  --space-9: 96px;  --space-10: 128px;
+
+  /* ============ ELEVATION ============
+     On dark: glows + thin borders, not drop shadows. On light: soft low shadows. */
+  --shadow-sm:  0 1px 2px rgba(0,0,0,0.08);
+  --shadow-md:  0 8px 24px rgba(0,0,0,0.10);
+  --shadow-lg:  0 24px 60px rgba(0,0,0,0.14);
+  --glow-green: 0 0 40px rgba(0,236,151,0.35);
+  --glow-green-sm: 0 0 16px rgba(0,236,151,0.45);
+
+  /* ============ MOTION ============ */
+  --ease-out:   cubic-bezier(0.16, 1, 0.3, 1); /* @kind other */
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1); /* @kind other */
+  --dur-fast:   140ms;  /* @kind other */
+  --dur:        240ms;  /* @kind other */
+  --dur-slow:   480ms;  /* @kind other */
+}
+
+/* ============================================================
+   SEMANTIC ELEMENT STYLES
+   Optional helper classes — use the vars directly if you prefer.
+   ============================================================ */
+.near-display {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--fs-display);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-display);
+}
+.near-h1 { font-family: var(--font-display); font-weight: 500; font-size: var(--fs-h1); line-height: var(--lh-snug); letter-spacing: var(--tracking-head); }
+.near-h2 { font-family: var(--font-display); font-weight: 500; font-size: var(--fs-h2); line-height: var(--lh-snug); letter-spacing: var(--tracking-head); }
+.near-h3 { font-family: var(--font-display); font-weight: 500; font-size: var(--fs-h3); line-height: 1.2; letter-spacing: var(--tracking-head); }
+.near-h4 { font-family: var(--font-display); font-weight: 500; font-size: var(--fs-h4); line-height: 1.25; }
+.near-body { font-family: var(--font-body); font-weight: 400; font-size: var(--fs-body); line-height: var(--lh-body); }
+.near-body-lg { font-family: var(--font-body); font-weight: 400; font-size: var(--fs-body-lg); line-height: 1.5; }
+.near-caption { font-family: var(--font-body); font-weight: 400; font-size: var(--fs-caption); line-height: 1.4; color: var(--fg-3); }
+.near-eyebrow {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: var(--fs-eyebrow);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+}
+.near-mono { font-family: var(--font-mono); font-variant-ligatures: none; }
+
+/* The signature "Title | Description" eyebrow pattern from the deck */
+.near-section-label {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 1.0625rem;
+  letter-spacing: -0.01em;
+}
+.near-section-label .sep { color: var(--accent); padding: 0 0.4em; }

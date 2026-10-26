@@ -1,0 +1,38 @@
+# one file per line; a "## label" line starts an overview group
+00-overview.md
+## open
+01-cold.md
+01-what-we-want.md
+01-rbac-applied.md
+01-data-classification.md
+01-on-the-record.md
+01-data-control-flow.md
+01-for-them.md
+01-case-refund.md
+01-case-teams.md
+01-case-card.md
+01-case-agent.md
+09-sealed-space.md
+09-sealed-in.md
+09-sealed-ask.md
+09-sealed-reveal.md
+09-sealed-audit.md
+## where we are
+01-where-we-are.md
+04-queue.md
+04-no-role.md
+05-open-data.md
+05-service-shut.md
+## the proposal
+07-roadmap.md
+07-v1.md
+07-v2.md
+07-v3.md
+07-v4.md
+07-v5.md
+## leave with this
+08-matrix.md
+## close
+09-circle.md
+09-factories.md
+09-mic.md
