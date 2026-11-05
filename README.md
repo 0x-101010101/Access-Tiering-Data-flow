@@ -37,6 +37,12 @@ The work already in front of the people who hold production stays. The old path 
 4. **The leave-behind.** Ten yes-or-no rows, Today through v5. A tick means that question is yes, and it stays yes. A cross means not yet. The limit sits in the question. A refund that never shows the seed, and one confidential trace, stay off the grid. Version 5 makes them possible. Building them is not part of version 5.
 5. **Close.** The five steps are the path back to the four cards (data integrity, refunds, independent team scaling, an environment for agents). Then AI factories and confidential inference. Then one sentence: ban agents and a fire lasts a week; let people run them and the same fire is fixed in a day, with no record and no fence. If this is worth doing for people, it is worth a hundred times more for agents.
 
+## Documents
+
+- [PowerPoint summary doc](https://docs.google.com/document/d/1408uf5Z7i0wViC1feHKkeAybmlwI35aOd-moPH_3LsI/edit?tab=t.of4xm3ncgov)
+- [High level proposal spec](https://docs.google.com/document/d/1nsRUd36Z9Fr6lJzCpT2wGKe9P-lbA8TaCSgIMaFmTqo/edit?tab=t.0)
+- [In-details proposal spec](https://docs.google.com/document/d/1UT0EgvUuLHaF_aiPpMdGyOOcgZdqZV75nlHrkzGDyIw/edit?tab=t.0#heading=h.c9fvdfgmya1p)
+
 ## Clone and open on a Mac
 
 Viewing needs no extra install. reveal.js, the fonts, and the stylesheet are in the repo. The built page is `deck/standalone.html`.
