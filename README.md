@@ -1,4 +1,8 @@
-# What this presentation is
+# Docs
+
+This repository is the home of the docs going forward. Markdown lives under [`docs/`](docs/), in a tree of directories named for their subject. The repository also holds the production-access presentation, in [`presentation/`](presentation/).
+
+## What the presentation is
 
 A reveal.js pitch for how production access on NEAR Intents should work: who may read the data, how sensitive that data is, and a record of the privileged read.
 
@@ -23,7 +27,7 @@ The PowerPoint is recorded on YouTube: [YouTube recording](https://youtu.be/WVJ1
 ```sh
 git clone https://github.com/0x-101010101/ReBac-Presentation.git
 cd ReBac-Presentation
-open deck/standalone.html
+open presentation/deck/standalone.html
 ```
 
-`open` hands the file to the default browser. Nothing else needs installing.
+`open` hands the file to the default browser. Nothing else needs installing. To rebuild the deck after editing slides, run `make` inside `presentation/`.

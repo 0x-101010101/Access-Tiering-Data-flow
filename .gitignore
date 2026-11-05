@@ -5,7 +5,7 @@
 Thumbs.db
 .cache/
 build/
-deck/audio/.cache.json
-deck/audio/text/
+presentation/deck/audio/.cache.json
+presentation/deck/audio/text/
 __pycache__/
 .shots/
