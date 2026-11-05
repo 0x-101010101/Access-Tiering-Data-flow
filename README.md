@@ -1,10 +1,8 @@
-# Docs
+# Improving production on NEAR Intents
 
-This repository is the home of the docs going forward. Markdown lives under [`docs/`](docs/), in a tree of directories named for their subject. The repository also holds the production-access presentation, in [`presentation/`](presentation/).
+This repository is a collection of docs, the presentation, and the other materials for that work stream. The presentation is a reveal.js pitch for how production access should work: who may read the data, how sensitive that data is, and a record of the privileged read.
 
-## What the presentation is
-
-A reveal.js pitch for how production access on NEAR Intents should work: who may read the data, how sensitive that data is, and a record of the privileged read.
+[`docs/`](docs/) holds the markdown, in a tree of directories named for their subject. [`presentation/`](presentation/) holds the pitch.
 
 ## Why the pitch exists
 
