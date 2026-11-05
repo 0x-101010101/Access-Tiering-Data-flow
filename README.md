@@ -1,6 +1,6 @@
-# Improving production on NEAR Intents
+# Improving production access on NEAR Intents
 
-This repository is a collection of docs, the presentation, and the other materials for that work stream. The presentation is a reveal.js pitch for how production access should work: who may read the data, how sensitive that data is, and a record of the privileged read.
+This repository is a collection of docs and other materials for a work stream which improves how production access, data flow, security and more works on NEAR Intents.
 
 [`docs/`](docs/) holds the markdown, in a tree of directories named for their subject. [`presentation/`](presentation/) holds the pitch.
 
