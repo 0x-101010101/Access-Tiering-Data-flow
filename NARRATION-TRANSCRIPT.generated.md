@@ -12,109 +12,83 @@ Two lines, then stop. We are past product-market fit. We cannot afford to keep a
 
 What follows is the vision. Several tracks move at once. They are one system, which is why they are in one room. It will change as each stage lands. You are invited into the direction. What a person can read is their role, applied to how sensitive the data is. The team that owns the service grants the role, and it expires on its own. Sensitivity is declared once, where the data is produced, and it travels with the data. Every privileged read, grant, and command is on the record. The view is the data moving through Intents, not only the service that runs it. Access is decided by the data's sensitivity and the person's role, not by who they know or who is awake.
 
-## [01:22] 01 · <span class="prefix">ReBAC:</span> the stricter label stays (est.)
+## [01:22] 01 · <span class="prefix">ReBAC:</span> defining hierarchical tiers of access (est.)
 
-A partner's confidential swap fails. The route line is T3. 1click-manager has the quote, and that quote is T2. The confidential intent holds the amount, the IP, and both legs, and that is T1. The quote and the intent meet in the trace the on-call opens, and the trace keeps T1. KYT was given the wallet and returned passing. Legal sees that result. A court order is this lawyer, this one case, for a fixed time. A role that can read 1click-manager would open every user's intents. The grant is this person, this trace, for one hour, for the label the trace still carries.
+A partner's confidential swap fails. The route line is T3. 1click-manager has the quote, and that quote is T2. The confidential intent holds the amount, the IP, and both legs, and that is T1. The quote and the intent meet in the trace the on-call opens, and the trace keeps T1. KYT was given the wallet and returned passing. Legal sees that result. A tenured person on the legal team holds T1 for this one case, so they can open this user's confidential intent for it, and nobody else's. A role that can read 1click-manager would open every user's intents. The grant is this person, this trace, for one hour, for the label the trace still carries.
 
-## [02:04] 01 · <span class="prefix">Data Classification:</span> a T2 reader sees the log line, minus secret fields (est.)
+## [02:09] 01 · <span class="prefix">Data Classification:</span> a T2 reader sees the log line, minus secret fields (est.)
 
-On the left is the same failed swap, one 1click-manager log line, with an amount, an IP, and a seed. On the right a tier 2 reader sees the line and the trace, and those three fields are gone. This picture is version 2. Version 1 still labels the whole service.
+On the left is the same failed swap, one 1click-manager log line. The swap type, confidential, is an ordinary field. The amount, the IP, the recipient address, and the refund address are tier 1. On the right a tier 2 reader sees the line, the trace, and that it was a confidential swap, and the four tier 1 fields are gone. This picture is version 2. Version 1 still labels the whole service.
 
-## [02:24] 01 · <span class="prefix">On the record:</span> everything recorded, auditability (est.)
+## [02:38] 01 · <span class="prefix">Data auditability:</span> everything recorded (est.)
 
 The tech lead's laptop gets hacked, and he does not know. Alerts start going off, and the CTO sees the tech lead doing suspicious things. The tech lead says he was not even at home, so an investigation is carried out. We discover we were hacked. Because everything is recorded, we have this power.
 
-## [02:46] 01 · <span class="prefix">Data Flow:</span> topological view of data flow (est.)
+Space brings the second pair in, and this one is about me. Deploying 1click-manager or the bridge is a high-risk, high-pressure task. One mistake and hundreds of thousands of users, their money, and our reputation are on the line. So it takes a lot of trust to hand that to someone. Imagine tomorrow someone asks me to help with those deploys. Honestly, I would rather not. I have never done it, and the fear of being the name in the morning when something blows up is enough to make me decline. Good organisations rely on systems, not people, and the record solves both halves of this at once. Every command I run is recorded as I run it. So the lead can hand me the task without handing me all of his trust, because the morning after he can see exactly what I ran. And I can do it with a clear head, because if I went by the book, the record shows that, and the review looks at what the system let happen rather than at me. That is what lets us give heavier roles to more people, and it is what lets someone act on a fire, Intents burning down, without the fear that they will carry the blame. Rely on the system, not the person. And the record is documentation nobody had to write: every fix that was ever run, as it was run, so the next engineer onboards from what actually happened.
+
+## [04:38] 01 · <span class="prefix">Data Flow:</span> topological view of data flow (est.)
 
 Point at the lock, then at the result. At 03:12 and 03:14 the outputs stay sealed. At 03:20 the check comes back passing, and the rows stay sealed. At 09:05 a reviewer opens that output, with a reason and one co-signer, and the opening is recorded. Emergency access still ends by itself, someone else is told now, and a named reviewer closes it. That is a recorded exception, not a back door. This picture is version 4.
 
-## [03:17] 01 · <span class="prefix">Long Term Vision:</span> Wouldn't it be nice (est.)
+## [05:09] 01 · <span class="prefix">Long Term Vision:</span> Wouldn't it be nice (est.)
 
 If confidentiality is a good business thesis, competition will follow, and staying ahead gives us a unique competitive advantage. Then stop.
 
-## [03:25] 01 · <span class="prefix">Refunds And Sanctioned Liquidity</span>Manual Refunds / AML release with one front door. (est.)
+## [05:18] 01 · <span class="prefix">Refunds And Sanctioned Liquidity</span>Manual Refunds / AML release with one front door. (est.)
 
-Today a person goes and sees the keys. There is no other way to refund. Case study one is the other way. People and agents come through one bastion. In version 4 it records exec and database sessions where we choose. In version 5 it is the only path. The refund job is attested, so it proves its code. The seed is tier 0, used inside the job, and it never comes back to the person who triggered it.
+Today a person goes and sees the keys. There is no other way to refund. Case study one is the other way. Space brings the diagram in four parts: people and agents, then the bastion, then production, then the seed and the refund job. The arrow still leaves the slide. People and agents come through one bastion. In version 4 it records exec and database sessions where we choose. In version 5 it is the only path. The refund job is attested, so it proves its code. The seed is tier 0, used inside the job, and it never comes back to the person who triggered it.
 
-## [03:57] 01 · <span class="prefix">Independat Team Scaling:</span> roles to climb, depth added as needed (est.)
+## [06:00] 01 · <span class="prefix">Independat Team Scaling:</span> roles to climb, depth added as needed (est.)
 
-Case study two. Teams scale to the hierarchy of their needs. Legal handles more sensitive data, so its ladder runs from watching commands up to approving tier 1 in the domain. Frontend is less critical, so it stops at a loose read. An agent can hold that same loose role and contribute, and it sees only what the role allows.
+Case study two. Teams scale to the hierarchy of their needs. Legal handles more sensitive data, so its ladder is four rungs of real jobs. A compliance analyst reads T2: KYT results and case summaries. A compliance officer reviews AML cases and can open one case at T1 for a fixed time. Legal counsel handles jurisdiction and court orders, and co-signs those grants. The head of legal approves T1 in the legal domain. Each rung inherits the one below, and legal adds rungs without asking engineering. Frontend is less critical, so its ladder is three rungs and stops lower. A frontend engineer reads T3 logs. A senior engineer also deploys the frontend. The team lead adds people to those roles. Nothing on that ladder reaches confidential data, because nothing on that team needs to.
 
-## [04:21] 01 · <span class="prefix">Crypto Card Market & Data integrity:</span> a user under investigation (est.)
+## [06:54] 01 · <span class="prefix">Crypto Card Market & Data integrity:</span> a user under investigation (est.)
 
 Case study three. Imagine we enter the crypto card market as we are. We do not control the data, we cannot see it, and someone can reach all of it. There is no data control plane. We can build all the infrastructure we want, and without the operation it does not matter. Picture the other side. A card user is under investigation for sanctioned funds. The data around that user is classified and observed. Only the role can open it. Law enforcement gets the answer, not the rows. The court case holds that data past its time to live, and the rest is deleted when it expires. That is the confidence TradFi expects, and ordinary crypto does not give.
 
-## [05:08] 01 · <span class="prefix">Bullet Proof Sandbox To Faciliate Agents:</span> an agent can burn Intents, or run free (est.)
+## [07:42] 01 · <span class="prefix">Bullet Proof Sandbox To Faciliate Agents:</span> an agent can burn Intents, or run free (est.)
 
-Case study four. Anton running an agent can burn down Intents, because the agent holds his access. In the sandbox the agent is scoped to a role, so it can run free, and there is nothing for it to burn down. Ambiguous issues get solved orders of magnitude quicker. An approval is given with an expiry, as needed. The next slides are that sandbox as a room: one door, the agents inside, then the audit.
+Case study four. Anton running an agent can burn down Intents, because the agent holds his access. In the sandbox the agent is scoped to a role, so it can run free, and there is nothing for it to burn down. Ambiguous issues get solved orders of magnitude quicker. An approval is given with an expiry, as needed. The next slides are that sandbox as a room with one door, then a finding coming out instead of the data.
 
-## [05:38] 09 · <span class="prefix">Bullet Proof Sandbox To Faciliate Agents:</span> a sealed room with one door (est.)
+## [08:13] 09 · <span class="prefix">Bullet Proof Sandbox To Faciliate Agents:</span> a sealed room with one door (est.)
 
-Here is the sandbox as one room. The dotted line is an encrypted space. Inside it, the agents run in a trusted execution enclave, and the language model they use runs in its own sealed enclave on the GPU. The band between them is an encrypted channel, so prompts and answers never travel in the clear. The raw production data and logs live in the same space, read-only for the agents. There is one door, the bastion server. Commands come in through it, outputs go out through it. On the right the access log holds only its genesis entry. Each later entry will include the hash of the one before it.
+Space builds the room in three beats. First the dotted line and the encrypted-space label, an empty room. Then the door: the bastion, with in and out. Then everything inside at once: the raw data, the agent enclave, the encrypted channel and sealed model, and the access log. The arrow still leaves the slide. Here is the sandbox as one room. The dotted line is an encrypted space. It has one door, the bastion server. Commands come in through it, outputs go out through it, and nothing reaches the space any other way. Now what lives inside. The agents run in a trusted execution enclave, the agents run in a trusted execution enclave, and the language model they use runs in its own sealed enclave on the GPU. The band between them is an encrypted channel, so prompts and answers never travel in the clear. The raw production data and logs live in the same space, read-only for the agents. On the right the access log holds only its genesis entry. Each later entry will include the hash of the one before it.
 
-## [06:23] 09 · <span class="prefix">Bullet Proof Sandbox To Faciliate Agents:</span> a question goes in through the bastion (est.)
-
-An investigation starts. Someone sends a prompt through the bastion: agents, look at the raw data and find who caused this incident. The bastion lets it in, and the access log grows by one entry, chained to the genesis entry. Inside the sealed space the agents work on the raw production data, using the sealed model over the encrypted channel. Nothing has come out yet.
-
-## [06:49] 09 · <span class="prefix">Bullet Proof Sandbox To Faciliate Agents:</span> a finding comes out, not the data (est.)
+## [09:26] 09 · <span class="prefix">Bullet Proof Sandbox To Faciliate Agents:</span> a finding comes out, not the data (est.)
 
 What leaves is not the data. A statistical method found one account, with a stated confidence. It holds only aggregates and a method, so it is marked low sensitivity and is safe to read. They ask again: cross-check with a second method. Confidence rises from 91 percent to 97 percent. The loop can repeat. Every exchange is another link, four so far after the genesis entry.
 
-## [07:15] 09 · <span class="prefix">Bullet Proof Sandbox To Faciliate Agents:</span> confidence is high enough: reveal (est.)
+## [09:53] 01 · <span class="prefix">Current state of NEAR Intents:</span> Where we are (est.)
 
-The evidence is strong enough, so they ask for the account behind the finding. This is the first output that contains the sensitive field. It goes only to the approved reviewers. The log marks it sealed: the entry says that it happened, who received it, and its hash. It does not keep the account in the clear. The request and the sealed release both join the chain.
+Let's ground ourselves back to reality. This is why the vision. One thing first: none of this is a fault of the people who hold production today. They are how it has stayed up. It is what a process with no roles produces, and the process is the subject. Four problems, four cards. Engineering velocity is not uniform. A few people move at full speed in production; everyone else waits on them. About thirty services run in a handful of projects, and two people can open them, so every read by anyone else is a request, and the engineer who shipped a change cannot watch it run. That debt compounds: every hire, service, and partner widens the surface, and access, logging, and server access are being fixed as separate projects. We trust people, not systems. Right now our trust sits in a few engineers, not in our infrastructure. Imagine a migration of confidential intents that touches services owned by three teams. A step goes wrong in production, no team can see it, each works from its own theory, and the fix is small once a lead has an hour to read the logs. Nothing about the fix needed those people, only their access. That is a lot of pressure on a few people, and people come and go. A robust system takes that pressure off them, and lets us rely on infrastructure that stays. Organisational security risk. Standing access to every project, every user, and the seed is bound to a few people's laptops, so one compromised machine is the whole system, with no scope, no expiry, and no record. And confidentiality has no dial yet. Nothing classifies what is sensitive, no role says who may read it, and no record says who did, so today there is no setting to turn. The three pieces of the model are that dial: data classification says what is sensitive, ReBAC says who may read it, and auditability proves who did. Together they are a technical capability: we can raise confidentiality, access and encryption, as far as the business objectives want, with the next level available on a switch when that decision is made. If confidentiality is the business thesis, that capability is the edge.
 
-## [07:42] 09 · <span class="prefix">Bullet Proof Sandbox To Faciliate Agents:</span> the audit: inputs visible, sealed outputs stay sealed (est.)
+Then the line, both hinges. The work relies on a few people. This is the path out, and the capability that raises the bar as far as the business wants.
 
-An auditor sends one more prompt through the bastion: show us the access audit log. What comes back, through the same door, is this table. The input column is the prompts, in the clear. The early findings are low sensitivity, so the method and the confidence are on the page. The reveal is sealed, with a pointer to its log entry, what kind of data left, how much, and who received it. The last row is this table itself. Every row is a link in the hash chain, so an access cannot be added or removed after the fact.
+## [12:34] 07 · Five versions (est.)
 
-## [08:22] 01 · <span class="prefix">Current state of NEAR Intents:</span> Where we are (est.)
+Five versions across two years. We are in Q4 2026. Version 1 starts in Q1 2027. Version 2 takes Q2 and Q3, one service at a time. Version 3 is Q4 2027. Version 4 is the first half of 2028, and version 5 is Q4 2028 and beyond. These quarters are the pace, not a commitment; nothing here lands in 2026. Version 3 can start while version 2 is still moving services, because the window needs version 1's roles and does not need the label on the line. Say that when you point at Q4 2027. The point of five versions is that the far vision arrives incrementally. It is backwards compatible. Current processes keep running, and nobody is blocked. A single organisation-wide change would be too fast. Each version is usable on its own, and the next one builds on it. And the reason to start now rather than when it hurts: the day comes when there is no alternative to having this, a card, a regulator, a partner's due diligence, a breach. On that day we want to be two years in, with roles, labels, and a record already running, not opening version 1 under pressure. Starting now is what makes us far ahead when it stops being optional. The next slides open one version at a time.
 
-Let's ground ourselves back to reality. This is why the vision. There is no formal access. Debugging, research, and engineering throughput stop with a handful of people. A one-line error sat for days on a wrong out-of-memory theory, because the log waited on someone who already had access. We learn who cannot act in the outage, including when that person is asleep. Access is per person, with no expiry, and someone who changes team keeps what they had. Only the longest-tenured touch production, so only they learn it, and a 3am fix exists at 10am only as memory. A refund prints the seed and a person derives the key. One confidential swap means opening every user, or the partner gets no answer, because both legs exist together only in our logs. A lead's laptop takes everything, with no record of what was read. There is no classification, so confidential lines shut a whole service. Legal exposure is not the same question as what an attacker could do, and logs never expire, so a legal hold has nothing to extend.
-
-Then the line. Only the tenured grow into production. The work relies on a few people, and there is no good path out. This is the infrastructure that gives us that path.
-
-## [09:46] 04 · Today, the work waits on a few people (est.)
-
-Bug fixes, debugging, and deploys wait on the same few people. We learn who cannot act while the outage is on, sometimes because that person is asleep. The people on the bug could not open the log. It waited on someone who already had access. A one-line error sat for days, and a wrong out-of-memory theory filled the wait. Who holds the access, and who gets to learn production, is the next slide.
-
-## [10:15] 04 · No role, so only the tenured learn it (est.)
-
-Access is a person, not a role. A team change keeps it, and leaving does not take it away. Only the longest-tenured touch production, so only they learn it, and everyone else falls further behind. A fix at 3am leaves no record. At 10am the only account is that person's memory.
-
-## [10:36] 05 · Today, sensitive data is already in the open (est.)
-
-A partner's confidential swap fails. To explain why, someone opens the service and can see every user's data. The alternative is that the partner gets no answer. A stuck deposit is refunded by a pull request that prints the seed, and a person derives the private key by hand. A lead's laptop is hacked and the attacker has the whole project, with no limit and no record. We have no view of the data flowing through Intents. We see services.
-
-## [11:08] 05 · A service is open, or it is shut (est.)
-
-A lead's laptop is compromised. The attacker has the whole project, with no limit and no record. Afterwards we cannot say what was taken or which users to warn, and that is the path from an internal incident to a public claim that Intents is not confidential. There is no classification. Legal exposure and what an attacker could do are not the same question. If part of a service's logs are confidential, the person who could read the rest gets nothing. Logs are never deleted, because nothing says when they may die, so a legal hold has nothing to extend. We see which service ran. We do not see what data moved through Intents.
-
-## [11:53] 07 · Five versions (est.)
-
-Five versions, one quarter each. We are in Q4 2026, so version 1 is this quarter and version 5 is Q4 2027. These quarters are the pace. Versions 3, 4, and 5 are not a commitment inside this year. Version 3's quarter can overlap version 2, because the window needs version 1's roles and does not need the label on the line. Say that when you point at Q2. The point of five versions is that the far vision arrives incrementally. It is backwards compatible. Current processes keep running, and nobody is blocked. A single organisation-wide change would be too fast. Each version is usable on its own, and the next one builds on it. The next slides open one version at a time.
-
-## [12:43] 07 · The service is the tier (est.)
+## [14:02] 07 · The service is the tier (est.)
 
 Version 1 is quick to ship, and people can opt into it straight away. Engineering feels the effect straight away, and later versions build on the same foundation. Sensitivity sits on the tier, roles are a simple acyclic graph, and teams scale on their own. It is incremental. Current work is not stopped.
 
-## [13:04] 07 · One service at a time (est.)
+## [14:23] 07 · One service at a time (est.)
 
 Version 2 runs in parallel, and current operational procedures keep running. It is the research phase for roles, how they are defined and graphed, and for what data sensitivity means per service and how it is rolled out. One service, in isolation, is the use case. The rest of the company keeps working while that proof runs. The result is a view of the data flowing through Intents. On that view we can build acts, metrics, access policies, and an action started safely.
 
-## [13:37] 07 · The foundation is in (est.)
+## [14:56] 07 · The foundation is in (est.)
 
-The foundation is in place. Sensitivity can be named in any service, and roles say how that data is managed. Iteration on those two is the organisational framework for Intents. The first hardening is an audit of sessions, so a compromised laptop is visible when the person says they were not the one acting. A hardware key for the people at the top is one suggestion for defence in depth, and it is said with the cut: the key has no screen. This is where the long-term work starts.
+The foundation is in place, and it gives us two qualities at once: secure by design, and defence in depth. Secure by design is the foundation itself. Sensitivity is named in any service, a role applies the rules for how that data is managed, a service with no tier cannot ship, and a new field inherits the safe default, so nothing is exposed by accident. Iteration on those two is the organisational framework for Intents. Defence in depth is the layers on top. The first layer is an audit of sessions, so a compromised laptop is visible when the person says they were not the one acting. The second layer, for the people at the top, is a hardware key, so a compromised computer is limited in what it can do and for how long. The key is one layer inside that pair, and it is said with the cut: a touch proves a person was there, and a key with no screen does not prove what they approved. This is where the long-term work starts.
 
-## [14:13] 07 · A gateway, in parallel (est.)
+## [16:06] 07 · A bastion, in parallel (est.)
 
-Version 4 introduces a gateway. No one person has direct access to production data, and interaction goes through it. That adds operational risk management and control. People can still interact, issue a command, operate on the data, and query it. It is security hardening that solves the risk without compromising the rest. It runs in parallel. A backdoor keeps direct access available while the gateway is tested.
+Version 4 introduces a bastion server. Commands go through it, and the session is recorded, so no one person reaches production data directly. People can still interact, issue a command, operate on the data, and query it. It runs in parallel. The direct path stays up beside the bastion while it is proven, and we measure how often that path is used. It can run as break-glass first: a reason, a second person told, a hard stop. It is security hardening that solves the risk without compromising the rest.
 
-## [14:40] 07 · The backdoor comes out (est.)
+## [16:42] 07 · The direct path comes out (est.)
 
-Version 5 is the end of the test. The gateway has been tested, and tested again, until it is the way the work happens. Then every backdoor comes out, and direct access is gone.
+Version 5 is the end of the test. We measure how often the direct path is used. It can run as break-glass first, a recorded exception rather than a habit. It comes out when that count has been zero long enough that people are comfortable. Then there is no backdoor, the bastion is the only way in, and every privileged command is on the record.
 
-## [14:53] 08 · What becomes true (est.)
+## [17:08] 08 · What becomes true (est.)
 
 Two ways of starting were set down, because each one blocks the first benefit. Labelling every log line, in all thirty services, before anyone new can read anything, waits on a shared logger and on every sensitivity kind. The first engineer stays blocked until that work is finished. Doing that fully in one service makes that service correct, and the company does not feel the change.
 
@@ -130,16 +104,16 @@ A command on a server is unrecorded through version 3. Version 4 puts a gateway 
 
 Version 5 is that same door, once it is the only one. The tenth row ticks because there is nowhere else to run a command. A refund that never shows the seed, and one confidential trace for one hour, are not on this table. Version 5 makes them possible. Building them is not part of version 5. Leave the table up through this. Take it down before the close.
 
-## [18:38] 09 · <span class="prefix">This versioned approach:</span> the path of least friction to this vision (est.)
+## [20:53] 09 · <span class="prefix">This versioned approach:</span> the path of least friction to this vision (est.)
 
 The versioned approach is the path of least friction to the long-term vision. The four cards are that vision. Great control over our data is not negotiable. A refund runs without revealing the data. Legal can have twenty levels, and frontend can stop at a read. Teams scale to the hierarchy of their needs. Imagine an environment with agents. The next slide is AI factories and confidential inference. The slide after that is the one sentence, said once.
 
-## [19:10] 09 · <span class="prefix">Where NEAR is going:</span> AI factories and confidential inference (est.)
+## [21:24] 09 · <span class="prefix">Where NEAR is going:</span> AI factories and confidential inference (est.)
 
 This is the direction, said once, after the vision is on the table. NEAR is going toward AI factories and confidential inference. Creation, debugging, and release move onto agents. The same roles, tiers, and sensitivity are the environment those agents run in. An agent drafts a change and reads only the tier its role holds. Confidential logs go to an agent on NEAR AI, the inference stays off Anthropic and OpenAI, and only the report comes back. A release command above the line waits for a person, and the grant expires. Inside confidential compute the agent sees the data, and the queries that leave reveal only aggregates. The work can be audited, traced, reviewed, and measured. The hundred-times sentence is the next slide, and it is said once.
 
-## [20:01] 09 · Ban agents, and a fire lasts a week (est.)
+## [22:16] 09 · Ban agents, and a fire lasts a week (est.)
 
 Put Axel in the chair. Ban agents, and a fire lasts a week. Let people run them, and the same fire is fixed in a day, with no record and no fence. Then the sentence, and stop. If we should do this for people, we need it a hundred times more for agents.
 
-**Total:** 20:22 (1222.0000 s, audio manifest, 32 estimated)
+**Total:** 22:37 (1356.8000 s, audio manifest, 25 estimated)

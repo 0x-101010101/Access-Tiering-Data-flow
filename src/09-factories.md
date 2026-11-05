@@ -1,4 +1,4 @@
-# <span class="prefix">Where NEAR is going:</span> AI factories and confidential inference {#factories .vision .stay-dark}
+# <span class="prefix">Where NEAR is going:</span> AI factories and confidential inference {#factories .vision .light}
 
 <p class="hook">Debugging and release move onto agents. Roles, tiers, and sensitivity hold the line.</p>
 
@@ -29,7 +29,7 @@ This is the direction, said once, after the vision is on the table. NEAR is goin
 Do not open this earlier. The hundred-times sentence is the next slide, and it closes.
 :::
 
-## Review · bonus, or the slide before the last {#factories--review .vision .stay-dark .review}
+## Review · bonus, or the slide before the last {#factories--review .vision .light .review}
 
 <p class="kicker">Not for the room. 22 Oct. Remove before the pitch.</p>
 

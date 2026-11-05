@@ -5,19 +5,19 @@
 <p class="hook">Several tracks, one system.</p>
 
 <div class="cards">
-<div class="card">
-<h3>Roles around the data</h3>
+<div class="card fragment fade-up">
+<h3>ReBAC (relationship-based access control)</h3>
 <p>What a person can read is their role, applied to how sensitive the data is. The team that owns the service grants the role.</p>
 </div>
-<div class="card">
+<div class="card fragment fade-up">
 <h3>Data classification</h3>
 <p>Sensitivity is declared once, where the data is produced, and it travels with the data.</p>
 </div>
-<div class="card">
-<h3>On the record</h3>
+<div class="card fragment fade-up">
+<h3>Data auditability</h3>
 <p>Every privileged read, grant, and command. Who can see what, who saw what, and why.</p>
 </div>
-<div class="card">
+<div class="card fragment fade-up">
 <h3>Data flow</h3>
 <p>A view of the data moving through Intents, not only of the service that runs it.</p>
 </div>
@@ -30,7 +30,7 @@ What follows is the vision. Several tracks move at once. They are one system, wh
 
 **More:**
 
-The two lines over the cards are the frame. Stay until the room can say them. The next slide is the relationship graph. The log line follows, then the compromised laptop, then the data-flow close. Down is today against one way it could feel, then a crash, then a confidential swap. Do not open agents.
+The two lines over the cards are the frame. Stay until the room can say them. Space brings the four cards in, in reading order: roles, classification, the record, then data flow. The arrow still leaves the slide. The last line is already up. The next slide is the relationship graph. The log line follows, then the compromised laptop, then the data-flow close. Down is today against one way it could feel, then a crash, then a confidential swap. Do not open agents.
 :::
 
 ## Review · invite them into one system {#what-we-want--review .vision .review}

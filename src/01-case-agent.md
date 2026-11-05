@@ -36,7 +36,7 @@
 <p class="dest">Ambiguous issues get solved orders of magnitude quicker. An approval is given with an expiry, as needed.</p>
 
 ::: notes
-Case study four. Anton running an agent can burn down Intents, because the agent holds his access. In the sandbox the agent is scoped to a role, so it can run free, and there is nothing for it to burn down. Ambiguous issues get solved orders of magnitude quicker. An approval is given with an expiry, as needed. The next slides are that sandbox as a room: one door, the agents inside, then the audit.
+Case study four. Anton running an agent can burn down Intents, because the agent holds his access. In the sandbox the agent is scoped to a role, so it can run free, and there is nothing for it to burn down. Ambiguous issues get solved orders of magnitude quicker. An approval is given with an expiry, as needed. The next slides are that sandbox as a room with one door, then a finding coming out instead of the data.
 :::
 
 ## Review · pause, then the boxes {#case-agent--review .vision .stay-dark .review}

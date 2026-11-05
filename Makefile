@@ -18,7 +18,7 @@ build/slides.md: $(SOURCES)
 
 deck/standalone.html: build/slides.md deck/deck.css tools/inline-audio.py tools/marks.lua $(wildcard deck/audio/manifest.json)
 	$(PANDOC) -o $@ build/slides.md
-	$(PYTHON) -c "p='deck/standalone.html'; t=open(p).read(); t=t.replace('vendor/reveal.js/dist/plugin/notes.js','vendor/reveal.js/plugin/notes/notes.js').replace('vendor/reveal.js/dist/plugin/search.js','vendor/reveal.js/plugin/search/search.js').replace('vendor/reveal.js/dist/plugin/zoom.js','vendor/reveal.js/plugin/zoom/zoom.js').replace('<section id=\"title-slide\">','<section id=\"title-slide\" data-background-color=\"#000000\">',1); open(p,'w').write(t)"
+	$(PYTHON) -c "p='deck/standalone.html'; t=open(p).read(); t=t.replace('vendor/reveal.js/dist/plugin/notes.js','vendor/reveal.js/plugin/notes/notes.js').replace('vendor/reveal.js/dist/plugin/search.js','vendor/reveal.js/plugin/search/search.js').replace('vendor/reveal.js/dist/plugin/zoom.js','vendor/reveal.js/plugin/zoom/zoom.js').replace('<section id=\"title-slide\">','<section id=\"title-slide\" data-background-color=\"#000000\">',1); needle='      });\n    </script>'; t=t.replace(needle, needle+'\n    <script src=\"keys.js\"></script>', 1); open(p,'w').write(t)"
 	@if [ -f deck/audio/manifest.json ]; then $(PYTHON) tools/inline-audio.py $@ deck/audio/manifest.json; fi
 
 setup:

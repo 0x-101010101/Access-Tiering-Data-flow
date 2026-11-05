@@ -5,19 +5,19 @@
 <p class="hook">We haven't even scratched the surface of the things we can achieve with such a system.</p>
 
 <div class="cards">
-<div class="card">
+<div class="card fragment fade-up">
 <h3>Crypto Card Market & Data integrity</h3>
 <p>It is not negotiable to have great control over our data as we expand into markets that mirror traditional finance.</p>
 </div>
-<div class="card">
+<div class="card fragment fade-up">
 <h3>Refunds And Sanctioned Liquidity</h3>
 <p>A manual refund runs without revealing the data. Partnerships with sanctioned liquidity providers run the release.</p>
 </div>
-<div class="card">
+<div class="card fragment fade-up">
 <h3>Independent team scaling</h3>
 <p>Legal can have twenty levels. Frontend can stop at a read. Teams scale to the hierarchy of their needs.</p>
 </div>
-<div class="card">
+<div class="card fragment fade-up">
 <h3>An environment for agents</h3>
 <p>Imagine an environment with agents. The control is granular enough that an agent can run without blowing up production.</p>
 </div>
@@ -30,7 +30,7 @@ If confidentiality is a good business thesis, competition will follow, and stayi
 
 **More:**
 
-Breath, then the teams card. Legal can have twenty levels. Frontend can stop at a read. Teams scale to the hierarchy of their needs. Breath, then the agents card. Imagine an environment with agents. Down is the key caveat, then the two jobs of the predicate. Do not open agents. That line is the last slide, and it is said once.
+Space brings the four cards in, in reading order: the card market, refunds, team scaling, then agents. The arrow still leaves the slide. The last line is already up. Breath, then the teams card. Legal can have twenty levels. Frontend can stop at a read. Teams scale to the hierarchy of their needs. Breath, then the agents card. Imagine an environment with agents. Down is the key caveat, then the two jobs of the predicate. Do not open agents. That line is the last slide, and it is said once.
 :::
 
 ## Review · the two lines he wants kept {#for-them--review .vision .review}

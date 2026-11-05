@@ -1,15 +1,15 @@
-# <span class="prefix">ReBAC:</span> the stricter label stays {#rbac-applied .vision .stay-dark}
+# <span class="prefix">ReBAC:</span> defining hierarchical tiers of access {#rbac-applied .vision .stay-dark}
 
-<p class="hook" id="ead-hook-swap">A confidential swap fails. The quote is T2. The intent is T1. The trace keeps T1. KYT returns passing.</p>
-<p class="hook" id="ead-hook-use" hidden>A lead inherits T1, T2, and T3. An engineer inherits T2 and T3.</p>
+<p class="hook" id="ead-hook-swap" hidden>A confidential swap fails. The quote is T2. The intent is T1. The trace keeps T1. KYT returns passing.</p>
+<p class="hook" id="ead-hook-use">A lead inherits T1, T2, and T3. An engineer inherits T2 and T3.</p>
 
-<button id="ead-toggle" class="ead-switch" type="button" aria-pressed="false">Roles</button>
+<button id="ead-toggle" class="ead-switch" type="button" aria-pressed="true">The swap</button>
 
 <div id="complex-animated-dag" class="diagram">
- <div class="viz-controls"><span id="ead-swap-controls"><button id="ead-play" type="button">Play</button><button id="ead-replay" type="button">Replay</button><button id="ead-step" type="button">Next stage</button><span id="ead-status" aria-live="polite">Three records for one failed swap</span></span></div>
- <div id="ead-stage"></div>
- <div id="ead-legend"></div>
- <div id="ead-use" hidden>
+ <div class="viz-controls"><span id="ead-swap-controls" hidden><button id="ead-play" type="button">Play</button><button id="ead-replay" type="button">Replay</button><button id="ead-step" type="button">Next stage</button><span id="ead-status" aria-live="polite">Three records for one failed swap</span></span></div>
+ <div id="ead-stage" hidden></div>
+ <div id="ead-legend" hidden></div>
+ <div id="ead-use">
   <svg viewBox="0 0 1040 320" role="img" aria-label="Ordinary fields together name one person. A lead inherits T1, T2, and T3. An engineer inherits T2 and T3.">
    <defs><marker id="ead-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#9ca3af"></path></marker></defs>
    <text x="20" y="28">Ordinary fields</text>
@@ -51,8 +51,8 @@
  </div>
 </div>
 
-<p class="dest" id="ead-dest-swap">A court order is this lawyer, this one case, for a fixed time.</p>
-<p class="dest" id="ead-dest-use" hidden>None of those fields is the name. Together they are one person. A lead holds T1, T2, and T3. An engineer holds T2 and T3.</p>
+<p class="dest" id="ead-dest-swap" hidden>A tenured person on the legal team holds T1 for this one case, and can open this user's confidential intent for it.</p>
+<p class="dest" id="ead-dest-use">None of those fields is the name. Together they are one person. A lead holds T1, T2, and T3. An engineer holds T2 and T3.</p>
 
 <script>
 (()=>{
@@ -91,23 +91,25 @@
  }
  function stop(){running=false;cancelAnimationFrame(frame);update()}
  function start(){if(time>=duration)time=0;if(reduce.matches){time=duration;update();return}running=true;last=0;update();frame=requestAnimationFrame(tick)}
- function tick(now){if(!running)return;if(last)time=Math.min(duration,time+(now-last)*2);last=now;update();if(time>=duration)stop();else frame=requestAnimationFrame(tick)}
+ function tick(now){if(!running)return;if(last){time+= (now-last)*2;if(time>=duration)time%=duration}last=now;update();frame=requestAnimationFrame(tick)}
  play.addEventListener('click',()=>running?stop():start());replay.addEventListener('click',()=>{stop();time=0;start()});step.addEventListener('click',()=>{stop();time=Math.min(duration,(Math.floor(time/3000)+1)*3000);update()}); document.addEventListener('visibilitychange',()=>{if(document.hidden)stop()});new ResizeObserver(draw).observe(stage);
  const toggle=document.getElementById('ead-toggle'),swapControls=document.getElementById('ead-swap-controls'),usePanel=document.getElementById('ead-use'),legend=document.getElementById('ead-legend'),hookSwap=document.getElementById('ead-hook-swap'),hookUse=document.getElementById('ead-hook-use'),destSwap=document.getElementById('ead-dest-swap'),destUse=document.getElementById('ead-dest-use');
- let showingUse=false;
- function setUse(on){showingUse=on;stage.hidden=on;legend.hidden=on;swapControls.hidden=on;usePanel.hidden=!on;hookSwap.hidden=on;hookUse.hidden=!on;destSwap.hidden=on;destUse.hidden=!on;toggle.textContent=on?'The swap':'Roles';toggle.setAttribute('aria-pressed',String(on));if(on)stop();else{time=0;start()}}
+ let showingUse=false,resume=false;
+ function applyUse(on){showingUse=on;stage.hidden=on;legend.hidden=on;swapControls.hidden=on;usePanel.hidden=!on;hookSwap.hidden=on;hookUse.hidden=!on;destSwap.hidden=on;destUse.hidden=!on;toggle.textContent=on?'The swap':'Roles';toggle.setAttribute('aria-pressed',String(on))}
+ function setUse(on){if(on){resume=running;stop()}applyUse(on);if(!on&&resume){resume=false;start()}}
  toggle.addEventListener('click',()=>setUse(!showingUse));
- function show(){const s=window.Reveal&&Reveal.getCurrentSlide();if(s&&s.id==='rbac-applied'){if(!showingUse){stop();time=0;start()}}else stop()}
+ document.addEventListener('keydown',(event)=>{if(event.key!==' '||event.altKey||event.ctrlKey||event.metaKey||event.shiftKey)return;const s=window.Reveal&&Reveal.getCurrentSlide();if(!s||s.id!=='rbac-applied')return;event.preventDefault();event.stopImmediatePropagation();setUse(!showingUse)},true);
+ function show(){const s=window.Reveal&&Reveal.getCurrentSlide();if(!(s&&s.id==='rbac-applied')){stop();return}resume=false;stop();time=0;stageIndex=-1;applyUse(true)}
  window.addEventListener('load',()=>{if(!window.Reveal||!Reveal.on)return;Reveal.on('slidechanged',show);if(Reveal.isReady&&Reveal.isReady())show();else Reveal.on('ready',show)});
 })();
 </script>
 
 ::: notes
-A partner's confidential swap fails. The route line is T3. 1click-manager has the quote, and that quote is T2. The confidential intent holds the amount, the IP, and both legs, and that is T1. The quote and the intent meet in the trace the on-call opens, and the trace keeps T1. KYT was given the wallet and returned passing. Legal sees that result. A court order is this lawyer, this one case, for a fixed time. A role that can read 1click-manager would open every user's intents. The grant is this person, this trace, for one hour, for the label the trace still carries.
+A partner's confidential swap fails. The route line is T3. 1click-manager has the quote, and that quote is T2. The confidential intent holds the amount, the IP, and both legs, and that is T1. The quote and the intent meet in the trace the on-call opens, and the trace keeps T1. KYT was given the wallet and returned passing. Legal sees that result. A tenured person on the legal team holds T1 for this one case, so they can open this user's confidential intent for it, and nobody else's. A role that can read 1click-manager would open every user's intents. The grant is this person, this trace, for one hour, for the label the trace still carries.
 
 **More:**
 
-The graph plays when the slide opens. Replay starts it again. Next stage jumps one beat: the three records, then 1click-manager receives the quote and the intent, then KYT is given the wallet, then the trace keeps T1 and KYT returns passing. Roles switches to two pictures. On the left, first name, profession, age, and a city together name one person. On the right, T3 reader is the base and T2 reader inherits it. An engineer inherits T2, so T2 and T3. A lead inherits T1, so T1, T2, and T3. The swap returns with The swap. Down is the 22 Oct note. The next face is the same trace as a 1click-manager log, one T2 reader, with the amount, the IP, and the seed removed.
+The face opens on the two Roles pictures. Space switches to the swap, and back. The swap graph waits. Play starts it, and it loops until Pause or you leave the slide. Replay starts it again. Next stage jumps one beat: the three records, then 1click-manager receives the quote and the intent, then KYT is given the wallet, then the trace keeps T1 and KYT returns passing. The Roles pictures: on the left, first name, profession, age, and a city together name one person. On the right, T3 reader is the base and T2 reader inherits it. An engineer inherits T2, so T2 and T3. A lead inherits T1, so T1, T2, and T3. Down is the 22 Oct note. The next face is the same trace as a 1click-manager log, one T2 reader, with the amount, the IP, and the seed removed.
 :::
 
 ## Review · why the relationship matters {#rbac-applied--review .vision .stay-dark .review}
@@ -115,7 +117,7 @@ The graph plays when the slide opens. Replay starts it again. Next stage jumps o
 <p class="kicker">Not for the room. 22 Oct. Remove before the pitch.</p>
 
 - **Heard.** From annotated data, through data flow and control flow, through the DAG, to ReBAC. ReBAC means reasoning about access from the relationship graph. The paper stays off the face.
-- **On the face now.** One failed confidential swap. The route line is T3, the 1click quote is T2, the intent is T1. They meet in 1click-manager. The on-call trace keeps T1. KYT returns passing, and the intent rows stay behind. Roles switches to both pictures: ordinary fields arrowing into one person, and the inheritance tree: an engineer inherits T2 and T3, a lead inherits T1, T2, and T3.
+- **On the face now.** Title "ReBAC: defining hierarchical tiers of access" (30 Oct). The face opens on the Roles pictures; space brings the swap. The swap: one failed confidential swap. The route line is T3, the 1click quote is T2, the intent is T1. They meet in 1click-manager. The on-call trace keeps T1. KYT returns passing, and the intent rows stay behind. Roles switches to both pictures: ordinary fields arrowing into one person, and the inheritance tree: an engineer inherits T2 and T3, a lead inherits T1, T2, and T3.
 - **The grant.** A role that can read 1click-manager would open every user's intents. The grant is this on-call, this one trace, for one hour. A court order is the same shape for a lawyer: this person, this one case, for a fixed time. Legal is that relationship. It is not a tier above T1.
 - The seed stays on the refund slide. The name ReBAC is said once, here.
 

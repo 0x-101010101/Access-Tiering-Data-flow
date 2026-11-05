@@ -949,6 +949,13 @@ body:has(.slides > section.present > section.light.present) .reveal .progress {
 }
 .reveal .before { border-left: 4px solid var(--warning); background: var(--tint-warning); }
 .reveal .after { border-left: 4px solid var(--near-green); background: var(--tint-green); }
+/* on-the-record: the second pair comes in on space and the bottom line swaps. */
+.reveal #on-the-record .columns.trust { margin-top: 10px; }
+.reveal #on-the-record .columns.trust + .dest,
+.reveal #on-the-record .columns.trust ~ .dest { margin-top: 14px; }
+.reveal #on-the-record .columns.trust:not(.visible) { display: none; }
+.reveal #on-the-record .dest.fade-out.visible { display: none; }
+.reveal #on-the-record .dest.fade-up:not(.visible) { display: none; }
 .reveal .column strong { color: var(--fg-1); }
 .reveal .column li strong { font-weight: 500; }
 .reveal .column pre { margin: 0.15em 0 0.35em; }
