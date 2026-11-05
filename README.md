@@ -16,7 +16,7 @@ The same proposal is written up in three documents: a short summary of the deck,
 
 ## YouTube recording
 
-The PowerPoint is recorded on YouTube: [YouTube recording](https://youtu.be/5-1ZX3vl_7s). It is long, so play it at 2× or 3×.
+The PowerPoint is recorded on YouTube: [YouTube recording](https://youtu.be/WVJ1W1VxKyY). It is long, so play it at 2× or 3×.
 
 ## Clone and open on a Mac
 
